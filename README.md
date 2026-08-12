@@ -21,16 +21,16 @@ Scripture runs it backwards, and so does the evidence:
 
 | | | |
 |---|---|---|
-| **BE** | Identity is assigned *before* the behaviour matches it. | Abram was renamed "father of many nations" while childless (Gen 17:5). Gideon was called "thou mighty man of valour" *while hiding in a winepress* (Judg 6:12). "…calleth those things which be not as though they were" (Rom 4:17). |
+| **BE** | Identity is assigned *before* the behaviour matches it. | Abram was renamed "father of many nations" while childless (Gen 17:5). Gideon was called "thou mighty man of valour" *while hiding in a winepress* (Judg 6:12). Paul describes the God Abraham believed as one who names what is not yet visible (Rom 4:17). |
 | **DO** | Each action is a vote. The tally becomes the self. | Bem (1972): people infer who they are by observing their own behaviour. The game never says "task complete" — it says *"the evidence now says you are a person who trains, 71% of the time."* |
-| **HAVE** | The result is added, never chased. | Pham & Taylor (1999): students who simulated the **outcome** did *worse than controls*; those who simulated the **process** did better. So the daily screen shows the next rep, and the board is kept as a memorial. "…all these things shall be added unto you" (Matt 6:33). |
+| **HAVE** | The result is added, never chased. | Pham & Taylor (1999): students who simulated the **outcome** did *worse than controls*; those who simulated the **process** did better. So the daily screen shows the next rep, and the board is kept as a memorial. Christ tells the crowd not to be anxious, and puts seeking God's kingdom before the things that get added (Matt 6:33). |
 
 ---
 
 ## What is actually in it
 
 **The vision board.** Upload a photo of your real board and tap each thing on it to set a
-**Stone** — the twelve memorial stones out of the Jordan (Josh 4:6). Or describe them one
+**Stone**, after the twelve memorial stones taken out of the Jordan (Josh 4:6). Or describe them one
 at a time. The image never leaves your device and is stripped from anything your circle
 can see.
 
@@ -47,8 +47,8 @@ I will [action] at [place]"* — Gollwitzer & Sheeran (2006), 94 studies, d = 0.
 **The private Why.** Sealed per identity, stored under a **separate storage key**, excluded
 from every sync and export by default. Before a hard step the game puts it full-screen and
 holds the button for a moment before it arms — values affirmation buffers the stress
-response and improves performance (Cohen & Sherman 2014). "…pray to thy Father which is in
-secret" (Matt 6:6).
+response and improves performance (Cohen & Sherman 2014). Christ contrasts prayer offered
+privately to the Father with prayer performed for an audience (Matt 6:6).
 
 **Two maps.**
 - *Promised Land* — four territories under fog of war, revealed as you take ground:
@@ -76,8 +76,8 @@ The gap between the lines is the **Yield**, reported in the parable's own units:
 **Grace instead of streak-loss.** Miss a day and a grace token covers it; the streak stands,
 momentum takes the hit. Streaks *never* zero out. This is not softness — Lally (2010) found
 a single missed day did **not** measurably harm the automaticity trajectory, so punishing it
-is factually wrong, and all-or-nothing framing triggers the what-the-hell effect. "For a
-just man falleth seven times, and riseth up again" (Prov 24:16). An unfinished *today* is
+is factually wrong, and all-or-nothing framing triggers the what-the-hell effect. Proverbs 24:16
+describes the just man as one who rises again after falling. An unfinished *today* is
 never counted as a miss.
 
 **The Sabbath lock.** One day a week the game **refuses to serve you quests**. Psychological
@@ -87,12 +87,12 @@ fourth commandment.
 **The Upper Room.** Timed focus blocks that do not end at the timer — they end after a
 mandatory stillness window. Attention gates plasticity (Recanzone & Merzenich 1993), and
 quiet rest right after practice produces the replay that predicts later performance (Foster
-& Wilson 2006). Skipping the stillness forfeits part of the credit. "Be still, and know that
-I am God" (Ps 46:10).
+& Wilson 2006). Skipping the stillness forfeits part of the credit
+(Ps 46:10).
 
 **The Covenant Circle.** Friends by invite code, group chat, and a recap showing where each
-person started versus where they are now. "A threefold cord is not quickly broken" (Eccl
-4:12).
+person started versus where they are now. Ecclesiastes 4:12 on the strength of company over
+isolation.
 
 **The Chronicle.** Nothing completes silently. After every action the game writes a note of
 what was accomplished and what it built toward — Amabile & Kramer (2011) found progress in
@@ -116,7 +116,7 @@ npm run build    # writes dist/index.html
 Then open `dist/index.html` — from disk, or host it anywhere static. It is one file.
 
 ```bash
-npm test          # 150 unit tests
+npm test          # 210 unit tests
 npm run test:e2e  # 37 browser tests
 npm run test:all  # everything
 ```
@@ -183,7 +183,7 @@ step and not a dashboard of competing priorities.
 Science is the servant here, not the master. It describes the machinery the Word already
 commanded.
 
-> My sheep hear my voice, and I know them, and they follow me. — **John 10:27**
+> My sheep hear my voice, and I know them, and they follow me: — **John 10:27**
 
 ---
 
