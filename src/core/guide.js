@@ -9,10 +9,8 @@
  * A deliberate design constraint: ONE step. Not a list, not a dashboard of
  * competing priorities.
  *
- *   "Thy word is a lamp unto my feet, and a light unto my path." — Ps 119:105
- *
- * A lamp at the feet lights the next step, not the whole road. The game is
- * built to that spec.
+ * The design follows the image in Psalm 119:105 (printed in full in the UI):
+ * a lamp at the feet lights the next step, not the whole road.
  *
  * On the guide's voice: it never speaks AS Christ and never puts words in
  * His mouth. It carries the lamp — it surfaces His actual words and points
@@ -259,8 +257,8 @@ export function accomplishmentNote({ quest, stone, identity, award, tally, read 
     title: identityLine || 'A vote was cast.',
     body: bits.join(' '),
     refs: [
-      { ref: 'Hebrews 11:1', why: 'Evidence of things not seen — this is now on the books.' },
-      ...(award?.manna ? [{ ref: 'Exodus 16:4', why: 'Daily bread, gathered at a certain rate every day.' }] : []),
+      { ref: 'Hebrews 11:1', why: 'Hebrews describes faith as the evidence of what is not yet seen.' },
+      ...(award?.manna ? [{ ref: 'Exodus 16:4', why: 'God promised bread from heaven, to be gathered daily as a test of obedience.' }] : []),
     ],
     meta: { questId: quest.id, stoneId: stone?.id || null, identityId: identity?.id || null, xp: award?.xp || 0 },
   };

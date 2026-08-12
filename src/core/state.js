@@ -10,26 +10,75 @@
  * privacy promise enforced by a boolean is one refactor away from being
  * broken; one enforced by structure is not.
  *
- *   "…pray to thy Father which is in secret; and thy Father which seeth in
- *    secret shall reward thee openly."  — Matthew 6:6
+ * (Cited in the UI alongside Matthew 6:6, which is printed there in full.)
  */
 
 import { uid, dayKey } from './util.js';
 
 export const SCHEMA_VERSION = 1;
 
-/** The six territories of the Promised Land map. */
+/**
+ * The four territories of the Promised Land map — the domains actually on
+ * this player's vision board.
+ *
+ * `blurb` is plain description written by this app. It is deliberately NOT a
+ * verse fragment: a clipped half-verse presented as if it were the verse is
+ * exactly the kind of bending scripture is not for. Where a territory has a
+ * verse, it carries a `ref`, and the UI pulls the FULL text from
+ * data/scripture.js so nothing is ever quoted in part.
+ */
 export const DOMAINS = [
-  { key: 'body', name: 'Body', ref: '1 Corinthians 9:27', line: 'I keep under my body, and bring it into subjection.', hue: 8 },
-  { key: 'provision', name: 'Provision', ref: 'Deuteronomy 8:18', line: 'He giveth thee power to get wealth.', hue: 42 },
-  { key: 'household', name: 'Household', ref: 'Joshua 24:15', line: 'As for me and my house, we will serve the LORD.', hue: 152 },
-  { key: 'assignment', name: 'Assignment', ref: 'Esther 4:14', line: 'For such a time as this.', hue: 262 },
-  { key: 'craft', name: 'Craft', ref: 'Proverbs 22:29', line: 'A man diligent in his business shall stand before kings.', hue: 200 },
-  { key: 'communion', name: 'Communion', ref: 'John 15:5', line: 'He that abideth in me bringeth forth much fruit.', hue: 320 },
+  {
+    key: 'business',
+    name: 'Business',
+    ref: 'Proverbs 22:29',
+    blurb: 'The work, the income, the thing you are building.',
+    hue: 42,
+  },
+  {
+    key: 'health',
+    name: 'Health',
+    ref: '1 Corinthians 6:19',
+    blurb: 'The body you have to carry all the rest of it in.',
+    hue: 8,
+  },
+  {
+    key: 'family',
+    name: 'Family',
+    ref: 'Joshua 24:15',
+    blurb: 'Your household, and the people you are responsible to.',
+    hue: 152,
+  },
+  {
+    key: 'spirit',
+    name: 'Spiritual Growth',
+    ref: '2 Peter 3:18',
+    blurb: 'Communion, obedience, and knowing Him better than last year.',
+    hue: 262,
+  },
 ];
 
+/**
+ * Old domain keys map forward, so a save written before the territories were
+ * retuned still opens instead of losing its stones.
+ */
+const LEGACY_DOMAINS = {
+  body: 'health',
+  provision: 'business',
+  household: 'family',
+  assignment: 'business',
+  craft: 'business',
+  communion: 'spirit',
+};
+
+export function normalizeDomain(key) {
+  if (DOMAINS.some((d) => d.key === key)) return key;
+  return LEGACY_DOMAINS[key] || DOMAINS[0].key;
+}
+
 export function domain(key) {
-  return DOMAINS.find((d) => d.key === key) || DOMAINS[0];
+  const k = normalizeDomain(key);
+  return DOMAINS.find((d) => d.key === k) || DOMAINS[0];
 }
 
 /** A fresh, empty game. */
@@ -144,6 +193,10 @@ export function migrate(raw) {
   for (const k of ['identities', 'boards', 'stones', 'quests', 'votes', 'pings', 'focusBlocks', 'manna', 'chronicle', 'letters']) {
     if (!Array.isArray(out[k])) out[k] = [];
   }
+  // Remap territories from the earlier six-domain layout.
+  for (const s2 of out.stones) s2.domain = normalizeDomain(s2.domain);
+  for (const i of out.identities) i.domain = normalizeDomain(i.domain);
+
   if (!Array.isArray(out.circle.members)) out.circle.members = [];
   if (!Array.isArray(out.circle.messages)) out.circle.messages = [];
   out.version = SCHEMA_VERSION;
@@ -156,7 +209,7 @@ export function addIdentity(state, { statement, domain: dom }) {
   const identity = {
     id: uid('idn'),
     statement: String(statement).trim(),
-    domain: dom || 'assignment',
+    domain: normalizeDomain(dom),
     vestment: '',
     createdAt: Date.now(),
   };
@@ -168,7 +221,7 @@ export function addStone(state, { title, domain: dom, identityId, boardId, x, y,
   const stone = {
     id: uid('stn'),
     title: String(title || '').trim(),
-    domain: dom || 'assignment',
+    domain: normalizeDomain(dom),
     identityId: identityId || null,
     boardId: boardId || null,
     x: typeof x === 'number' ? x : null,   // 0..1 relative to board image

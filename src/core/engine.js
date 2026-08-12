@@ -320,8 +320,7 @@ export function decayManna(mannaGrants, today, cfg = REWARD) {
 //    framing triggers the what-the-hell effect: the lapse does little damage,
 //    the interpretation does.
 //
-//    "For a just man falleth seven times, and riseth up again." Prov 24:16
-//    "They are new every morning."                              Lam 3:23
+//    See Proverbs 24:16 and Lamentations 3:23, both printed in full in the UI.
 // ─────────────────────────────────────────────────────────────────────────
 
 export const GRACE = {
@@ -456,7 +455,7 @@ export function restorationFraming(lastActiveDay, today) {
 //    A game that refuses to let you play. Sonnentag & Fritz (2007) found
 //    psychological DETACHMENT predicts recovery better than rest alone,
 //    so the lock has to actually withhold the quests.
-//    "Remember the sabbath day, to keep it holy." Exodus 20:8
+//    See Exodus 20:8, printed in full in the UI.
 // ─────────────────────────────────────────────────────────────────────────
 
 export function sabbathState(settings, today) {

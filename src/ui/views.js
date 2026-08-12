@@ -9,18 +9,31 @@
 import { esc, pct, ago, dayKey } from '../core/util.js';
 import { DOMAINS, domain } from '../core/state.js';
 import { PRINCIPLES, PILLARS } from '../data/neuro.js';
-import { SCRIPTURE } from '../data/scripture.js';
+import { SCRIPTURE, verseByRef } from '../data/scripture.js';
 import { IDENTITY_TIERS, NAME_ARCHETYPES, automaticityAt } from '../core/identity.js';
 import { DIFFICULTY, FOCUS_PRESETS, difficulty } from '../core/engine.js';
 
 // ── shared fragments ──────────────────────────────────────────────────────
 
+/**
+ * Render a verse.
+ *
+ * The verse text is the Authorized Version verbatim. Anything this app has to
+ * say about it is rendered separately and labelled "Note from this app", so a
+ * reader is never left guessing which words are scripture and which are ours.
+ */
 export function verseBlock(v, { small = false, note = true } = {}) {
   if (!v) return '';
   return `<blockquote class="verse${small ? ' sm' : ''}">${esc(v.text)}
-    <span class="ref">${esc(v.ref)} · KJV</span>
-    ${note && v.note ? `<span class="note">${esc(v.note)}</span>` : ''}
+    <span class="ref">${esc(v.ref)} · Authorized (King James) Version</span>
+    ${note && v.context ? `<span class="note"><b>Note from this app:</b> ${esc(v.context)}</span>` : ''}
   </blockquote>`;
+}
+
+/** A territory's verse, always in full, pulled from the one bank. */
+export function domainVerse(key) {
+  const d = domain(key);
+  return d.ref ? verseByRef(d.ref) : null;
 }
 
 export function whyBlock(p, label = 'Why this, now') {
@@ -389,6 +402,16 @@ export function mapView(ctx) {
       <div class="map-legend">
         ${DOMAINS.map((d) => `<span><i style="background:hsl(${d.hue} 50% 55%)"></i>${esc(d.name)} · ${territories[d.key]?.done || 0}/${territories[d.key]?.total || 0}</span>`).join('')}
       </div>
+      <hr class="sep">
+      <div class="eyebrow">A word over each territory</div>
+      ${DOMAINS.map((d) => {
+        const v = domainVerse(d.key);
+        return v ? `<div style="margin-bottom:10px">
+          <div class="t" style="color:hsl(${d.hue} 55% 68%)">${esc(d.name)}</div>
+          <div class="tiny mut">${esc(d.blurb)}</div>
+          ${verseBlock(v, { small: true, note: false })}
+        </div>` : '';
+      }).join('')}
     </div>
   ` : `
     <div class="card">

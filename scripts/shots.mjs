@@ -20,7 +20,7 @@ await sealWhy(page, 'Because my father died at 54 and I refuse to leave my kids 
 // A second identity in another territory.
 await page.click('[data-testid=btn-new-identity]');
 await page.fill('[data-testid=id-statement]', 'I am a woman who ships work she is proud of every week');
-await page.selectOption('[data-testid=id-domain]', 'craft');
+await page.selectOption('[data-testid=id-domain]', 'business');
 await page.click('[data-testid=identity-save]');
 await page.waitForSelector('[data-testid=why-text]');
 await page.keyboard.press('Escape');
@@ -34,7 +34,7 @@ await writeQuest(page, { cue: 'I finish breakfast', action: 'run for twenty minu
 await page.click('[data-testid=nav-vision]');
 await page.click('[data-testid=btn-describe]');
 await page.fill('[data-testid=s-title]', 'The studio with north light');
-await page.selectOption('[data-testid=s-domain]', 'craft');
+await page.selectOption('[data-testid=s-domain]', 'business');
 await page.click('[data-testid=stone-save]');
 await page.waitForSelector('[data-testid=woop-outcome]');
 await page.fill('[data-testid=woop-outcome]', 'I walk in at 7am and the light is already good and the work is waiting');

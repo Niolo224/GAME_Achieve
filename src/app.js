@@ -7,7 +7,7 @@
 
 import { esc, dayKey, uid, clamp, pct, hashStr, daysBetween, addDays } from './core/util.js';
 import {
-  emptyState, emptyVault, migrate, shareable, summarize, DOMAINS, domain,
+  emptyState, emptyVault, migrate, shareable, summarize, DOMAINS, domain, normalizeDomain,
   addIdentity, addStone, addQuest, castVote, addPing, chronicle, setWhy, getWhy,
 } from './core/state.js';
 import {
@@ -22,7 +22,7 @@ import {
 import { validateIdentity, tallyIdentity, evidenceStatement, automaticityAt } from './core/identity.js';
 import { readState, nextStep, wordForToday, accomplishmentNote, buildRecap } from './core/guide.js';
 import { runGrowth, buildSeries, explainRate, displayTerms } from './core/growth.js';
-import { verseFor } from './data/scripture.js';
+import { verseFor, verseByRef } from './data/scripture.js';
 import { principle } from './data/neuro.js';
 import * as V from './ui/views.js';
 
@@ -65,7 +65,7 @@ function boot() {
       kind: 'manna_spoiled',
       title: `${decayed.spoiledCount} manna spoiled`,
       body: 'Gathered but never spent. What was kept overnight bred worms — the daily portion is meant to be used.',
-      refs: [{ ref: 'Exodus 16:20', why: 'Hoarded provision rots.' }],
+      refs: [{ ref: 'Exodus 16:20', why: 'Israel was told to gather only a day\'s portion; what was kept overnight spoiled.' }],
     });
   }
 
@@ -282,7 +282,9 @@ function drawLand(ctx) {
   g.fillStyle = grd;
   g.fillRect(0, 0, W, H);
 
-  const cols = 3, rows = 2;
+  // Grid adapts to however many territories are configured.
+  const cols = DOMAINS.length <= 4 ? 2 : 3;
+  const rows = Math.ceil(DOMAINS.length / cols);
   const pad = Math.max(10, W * 0.029);
   // Type scales with the real drawing width so it stays legible on a phone.
   const fs = clamp(W / 32, 10, 15);
@@ -329,12 +331,13 @@ function drawLand(ctx) {
     g.fillText(t.total ? `${t.done}/${t.total} taken` : 'unclaimed', cx, cy + fs + 2);
   });
 
+  // The app's own caption. Joshua 1:3 is printed in full, with its reference
+  // and context, in the panel above — a canvas label cannot do that, and
+  // trimming a verse to fit a width is not something this app does.
   g.fillStyle = '#6f7284';
-  g.font = `italic ${clamp(W / 62, 9, 13)}px Georgia, serif`;
+  g.font = `${clamp(W / 62, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
-  g.fillText(W < 520
-    ? '“…that have I given unto you.” — Joshua 1:3'
-    : '“Every place that the sole of your foot shall tread upon, that have I given unto you.”  — Joshua 1:3', W / 2, H - 8);
+  g.fillText('Ground is taken by treading it. Set a Stone in a territory to begin.', W / 2, H - 8);
 }
 
 function hexPath(g, cx, cy, r) {
@@ -362,8 +365,8 @@ function drawEarth(ctx) {
     g.font = `${clamp(W / 32, 12, 15)}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.fillText('No ground marked yet.', W / 2, H / 2 - 8);
-    g.font = `italic ${clamp(W / 40, 10, 13)}px Georgia, serif`;
-    g.fillText('“Hitherto hath the LORD helped us.” — 1 Samuel 7:12', W / 2, H / 2 + 18);
+    g.font = `${clamp(W / 40, 10, 13)}px ui-sans-serif, system-ui, sans-serif`;
+    g.fillText('Use “Ping me here” to mark where you stand.', W / 2, H / 2 + 18);
     return;
   }
 
@@ -451,12 +454,11 @@ function drawEarth(ctx) {
     g.fillText(label.length > 22 ? label.slice(0, 21) + '…' : label, x, y - 12);
   });
 
+  // As above: 1 Samuel 7:12 is printed in full above the map.
   g.fillStyle = '#6f7284';
-  g.font = `italic ${clamp(W / 60, 9, 12)}px Georgia, serif`;
+  g.font = `${clamp(W / 60, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
-  g.fillText(W < 520
-    ? '“…called the name of it Ebenezer.” — 1 Samuel 7:12'
-    : '“Then Samuel took a stone… and called the name of it Ebenezer.” — 1 Samuel 7:12', W / 2, H - 8);
+  g.fillText('Each marker is ground you actually stood on.', W / 2, H - 8);
 }
 
 // ── canvas: the two lines ─────────────────────────────────────────────────
@@ -582,7 +584,7 @@ const actions = {
       kind: 'origin',
       title: 'The vision was opened',
       body: `${name || 'A runner'} began. Nothing has been proved yet — and that is exactly where Gideon was standing when he was called a mighty man of valour.`,
-      refs: [{ ref: 'Habakkuk 2:2', why: 'Write the vision, and make it plain.' }],
+      refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
     });
     persist();
     App.view = 'identity';
@@ -595,7 +597,7 @@ const actions = {
     openModal(`
       <div class="eyebrow">Be</div>
       <h2>Who are you becoming?</h2>
-      ${V.verseBlock({ ref: 'Judges 6:12', text: 'And the angel of the LORD appeared unto him, and said unto him, The LORD is with thee, thou mighty man of valour.', note: 'Gideon was hiding in a winepress when he was called this. The name came first.' })}
+      ${V.verseBlock(verseByRef('Judges 6:12'))}
       <div class="field">
         <label for="id-statement">State it as already true</label>
         <input type="text" id="id-statement" placeholder="I am a man who trains before sunrise" data-testid="id-statement">
@@ -604,7 +606,7 @@ const actions = {
       <div class="field">
         <label for="id-domain">Which territory?</label>
         <select id="id-domain" data-testid="id-domain">
-          ${DOMAINS.map((d) => `<option value="${d.key}">${d.name} — ${d.line}</option>`).join('')}
+          ${DOMAINS.map((d) => `<option value="${d.key}">${d.name} — ${d.blurb}</option>`).join('')}
         </select>
       </div>
       <div id="id-errors"></div>
@@ -616,7 +618,7 @@ const actions = {
 
   'identity-save'() {
     const statement = document.getElementById('id-statement')?.value || '';
-    const dom = document.getElementById('id-domain')?.value || 'assignment';
+    const dom = document.getElementById('id-domain')?.value || DOMAINS[0].key;
     const check = validateIdentity(statement);
     const box = document.getElementById('id-errors');
     if (!check.ok) {
@@ -628,7 +630,7 @@ const actions = {
       kind: 'identity',
       title: `Named: ${identity.statement}`,
       body: 'Called before the evidence exists. Every step from here is a vote for or against this name.',
-      refs: [{ ref: 'Romans 4:17', why: 'God calleth those things which be not as though they were.' }],
+      refs: [{ ref: 'Romans 4:17', why: 'Paul describes the God Abraham believed, who names what is not yet visible.' }],
     });
     persist();
     closeModal();
@@ -663,7 +665,7 @@ const actions = {
       kind: 'letter',
       title: 'A letter was sealed from the appointed time',
       body: 'Closing the gap between you and your future self is one of the few interventions shown to change real financial and health behaviour.',
-      refs: [{ ref: 'Habakkuk 2:3', why: 'The vision is yet for an appointed time.' }],
+      refs: [{ ref: 'Habakkuk 2:3', why: 'The LORD tells Habakkuk the revelation has a set time and will not fail.' }],
     });
     persist(); render();
     toast('Sealed.', 'gold');
@@ -711,7 +713,7 @@ const actions = {
           kind: 'board',
           title: 'The vision was made plain',
           body: 'Your board is now in the game. Tap each thing on it to set a Stone.',
-          refs: [{ ref: 'Habakkuk 2:2', why: 'Write it, and make it plain upon tables.' }],
+          refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
         });
         persist();
         App.picking = true;
@@ -742,7 +744,7 @@ const actions = {
       document.getElementById('stone-errors').innerHTML = `<div class="err">Give it a name.</div>`;
       return;
     }
-    const dom = document.getElementById('s-domain')?.value || 'assignment';
+    const dom = document.getElementById('s-domain')?.value || DOMAINS[0].key;
     const identityId = document.getElementById('s-identity')?.value || null;
     const meta = JSON.parse(el.dataset.meta || '{}');
     const stone = addStone(App.state, { title, domain: dom, identityId, ...meta });
@@ -784,7 +786,7 @@ const actions = {
       kind: 'woop',
       title: `Counted the cost: ${stone.title}`,
       body: `The obstacle was named — "${woop.obstacle.slice(0, 90)}" — and answered with an if-then. This Stone is kindled.`,
-      refs: [{ ref: 'Luke 14:28', why: 'Sitteth not down first, and counteth the cost.' }],
+      refs: [{ ref: 'Luke 14:28', why: 'Christ\'s warning about beginning to build without first reckoning what it costs.' }],
     });
     persist();
     closeModal();
@@ -855,7 +857,7 @@ const actions = {
       body: third
         ? `"${quest.text}" has been passed over twice. That is a sizing problem, not a character problem — the game will shrink the next ask.`
         : 'Logged honestly. A missed step is information; it is not a verdict.',
-      refs: [{ ref: 'Proverbs 24:16', why: 'A just man falleth seven times, and riseth up again.' }],
+      refs: [{ ref: 'Proverbs 24:16', why: 'A proverb describing the just man as one who rises again after falling.' }],
     });
     if (third) {
       quest.level = adjustDifficulty(quest.level, -1);
@@ -918,7 +920,7 @@ const actions = {
           kind: 'ping',
           title: `Ground marked: ${label}`,
           body: 'A stone set where you actually stood. Context becomes part of the memory trace — the same act in the same place builds automaticity faster.',
-          refs: [{ ref: '1 Samuel 7:12', why: 'Samuel took a stone and called the name of it Ebenezer.' }],
+          refs: [{ ref: '1 Samuel 7:12', why: 'Samuel set a stone at Mizpeh to mark where God had helped Israel.' }],
         });
         persist(); render();
         toast('Ground marked.', 'gold');
@@ -942,7 +944,7 @@ const actions = {
       kind: 'circle',
       title: 'A circle was opened',
       body: 'Behaviour spreads through real networks up to three degrees. This is a multiplier in the growth maths, not decoration.',
-      refs: [{ ref: 'Ecclesiastes 4:12', why: 'A threefold cord is not quickly broken.' }],
+      refs: [{ ref: 'Ecclesiastes 4:12', why: 'Ecclesiastes on the strength of company over isolation.' }],
     });
     persist(); render(); refreshCircle();
     toast('Circle opened. Send the code.', 'gold');
@@ -982,7 +984,9 @@ const actions = {
   async nudge(el) {
     const m = App.members.find((x) => x.playerId === el.dataset.member);
     const name = m?.newName || m?.displayName || 'them';
-    await App.adapter.sendMessage(`◇ ${name} — considering you, to provoke unto love and to good works. (Hebrews 10:24)`, profile());
+    // The app's own words. A chat line cannot carry a verse with its
+    // reference and context, so it does not quote one.
+    await App.adapter.sendMessage(`◇ Thinking of you today, ${name}. Keep going.`, profile());
     refreshCircle();
     toast('Nudged.');
   },
@@ -1082,7 +1086,7 @@ function openStoneComposer(meta) {
   openModal(`
     <div class="eyebrow">A stone of remembrance</div>
     <h2>What is on your board?</h2>
-    ${V.verseBlock({ ref: 'Joshua 4:6', text: 'That this may be a sign among you, that when your children ask their fathers in time to come, saying, What mean ye by these stones?', note: 'Twelve stones out of the Jordan, set as a memorial. Your board is a pile of these.' })}
+    ${V.verseBlock(verseByRef('Joshua 4:6'))}
     <div class="field">
       <label for="s-title">Name it plainly</label>
       <input type="text" id="s-title" placeholder="The house with the red door" data-testid="s-title">
@@ -1136,7 +1140,7 @@ function completeQuest(quest, opts = {}) {
         kind: 'stone_taken',
         title: `Ground taken: ${stone.title}`,
         body: 'Every step bound to this Stone is complete. Faithful over a few things.',
-        refs: [{ ref: 'Matthew 25:21', why: 'Thou hast been faithful over a few things, I will make thee ruler over many.' }],
+        refs: [{ ref: 'Matthew 25:21', why: 'In the parable of the talents, the servant faithful with little is entrusted with more.' }],
       });
     }
   }
@@ -1163,7 +1167,7 @@ function completeQuest(quest, opts = {}) {
       <div class="manna">
         <div class="m-title">Manna fell.</div>
         <p class="small mut">Unearned surplus, on top of what you expected. It cannot be hoarded — unspent, it spoils in two days.</p>
-        ${V.verseBlock({ ref: 'Exodus 16:4', text: 'Behold, I will rain bread from heaven for you; and the people shall go out and gather a certain rate every day, that I may prove them, whether they will walk in my law, or no.' })}
+        ${V.verseBlock(verseByRef('Exodus 16:4'))}
         <button class="btn primary" data-act="close-modal">Gather it</button>
       </div>`);
   } else {
@@ -1246,7 +1250,7 @@ function finishFocus() {
     kind: 'focus',
     title: `${f.minutes} minutes in the Upper Room`,
     body: `${credit.message} Credited ${credit.credited} of ${credit.raw} minutes.`,
-    refs: [{ ref: 'Psalm 46:10', why: 'Be still, and know that I am God.' }],
+    refs: [{ ref: 'Psalm 46:10', why: 'The psalm\'s call to stillness before God.' }],
   });
   App.focus = null;
   persist();

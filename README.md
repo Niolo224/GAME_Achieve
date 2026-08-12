@@ -51,11 +51,11 @@ response and improves performance (Cohen & Sherman 2014). "…pray to thy Father
 secret" (Matt 6:6).
 
 **Two maps.**
-- *Promised Land* — six territories (Body, Provision, Household, Assignment, Craft,
-  Communion) under fog of war, revealed as you take ground. "Every place that the sole of
-  your foot shall tread upon, that have I given unto you" (Josh 1:3).
-- *Real ground* — **Ping me here** drops an **Ebenezer** at your actual coordinates:
-  *"Hitherto hath the LORD helped us"* (1 Sam 7:12). This is not decoration — Godden &
+- *Promised Land* — four territories under fog of war, revealed as you take ground:
+  **Business, Health, Family, Spiritual Growth**. Each carries a verse, printed in full
+  (Proverbs 22:29 · 1 Corinthians 6:19 · Joshua 24:15 · 2 Peter 3:18).
+- *Real ground* — **Ping me here** drops a marker at your actual coordinates, named after
+  the stone Samuel set at Mizpeh (1 Samuel 7:12). This is not decoration — Godden &
   Baddeley (1975) showed physical context becomes part of the memory trace, so the same act
   in the same place builds automaticity faster.
 
@@ -186,6 +186,32 @@ commanded.
 > My sheep hear my voice, and I know them, and they follow me. — **John 10:27**
 
 ---
+
+## On the scripture
+
+Three rules govern every verse in this app, and there is a test suite enforcing each one.
+
+**1. Verses appear exactly as they read in the Bible.** Authorized (King James) Version,
+verbatim and complete. No verse is trimmed to the clause that suits a mechanic, reworded,
+paraphrased, or given a bracketed gloss. `tests/unit/scripture-fidelity.test.js` holds a
+reference table transcribed independently of the app and compares character for character —
+if anyone ever shortens a verse to make it land better, the build fails.
+
+**2. Verse text lives in exactly one place.** `src/data/scripture.js`. No module quotes a
+verse inline, and nothing draws scripture onto a canvas where it cannot carry its reference.
+A test scans the source for any six-word run lifted out of a verse and fails on it.
+
+**3. The app's commentary is labelled as the app's commentary.** Every note renders under
+"Note from this app", and each one opens by stating what is happening in the passage on its
+own terms before saying anything about the game. Where the app borrows a name — Stone,
+Manna, Ebenezer — it says plainly that it is borrowing. The verse is not bent to fit the
+mechanic; the mechanic is told to stand next to the verse and explain itself.
+
+Corrections applied on review: Romans 4:17 had lost its parentheses; Psalm 46:10, Proverbs
+23:7, Zechariah 4:10, Revelation 12:11, Matthew 17:20 and Luke 9:23 had been cut short at
+the useful clause; the territory labels were clipped half-verses; and the commentary on
+Jeremiah 29:11 and 3 John 1:2 had been bent toward the game rather than left in its own
+setting. All are fixed and covered by tests.
 
 ## Sources
 
