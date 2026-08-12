@@ -1,4 +1,4 @@
-<title>Achieve — Write The Vision</title>
+<title>Write The Vision</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="A gamified vision board built on Be → Do → Have, with scripture as the mainframe and behavioural neuroscience as the mechanics.">
 <meta name="color-scheme" content="dark">
@@ -3001,9 +3001,34 @@ const KEY_VAULT = 'achieve.vault.v1';   // private. never synced. never exported
 
 // ── device persistence ────────────────────────────────────────────────────
 
+/**
+ * In-memory fallback for environments where localStorage is blocked
+ * (sandboxed iframes, private-mode quirks). The game keeps working for the
+ * session instead of failing on every save; the player is warned once that
+ * it will not survive a reload.
+ */
+const memory = new Map();
+let storageBroken = false;
+let warnedOnce = false;
+
+function backing() {
+  try {
+    const ls = globalThis.localStorage;
+    if (!ls) return null;
+    // Probe: some embeds expose the object but throw on write.
+    ls.setItem('achieve.probe', '1');
+    ls.removeItem('achieve.probe');
+    return ls;
+  } catch {
+    storageBroken = true;
+    return null;
+  }
+}
+
 function loadLocal(key, fallback) {
   try {
-    const raw = globalThis.localStorage?.getItem(key);
+    const ls = backing();
+    const raw = ls ? ls.getItem(key) : memory.get(key);
     return raw ? JSON.parse(raw) : fallback;
   } catch {
     return fallback;
@@ -3011,14 +3036,30 @@ function loadLocal(key, fallback) {
 }
 
 function saveLocal(key, value) {
+  const json = JSON.stringify(value);
+  const ls = backing();
+
+  if (!ls) {
+    memory.set(key, json);
+    if (storageBroken && !warnedOnce) {
+      warnedOnce = true;
+      return { ok: false, error: 'This browser is blocking local storage, so your progress will not survive a reload. Export a save to keep it.' };
+    }
+    return { ok: true, memoryOnly: true };
+  }
+
   try {
-    globalThis.localStorage?.setItem(key, JSON.stringify(value));
+    ls.setItem(key, json);
     return { ok: true };
   } catch (err) {
     // Quota is the realistic failure here — vision board images are large.
-    return { ok: false, error: String(err && err.name === 'QuotaExceededError'
-      ? 'Storage is full. Remove or shrink a vision board image.'
-      : err) };
+    memory.set(key, json);
+    return {
+      ok: false,
+      error: err && err.name === 'QuotaExceededError'
+        ? 'Storage is full — try a smaller vision board image, or export and clear old data.'
+        : 'Could not save to this device. Your work is held in memory for now.',
+    };
   }
 }
 
