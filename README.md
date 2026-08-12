@@ -51,9 +51,10 @@ response and improves performance (Cohen & Sherman 2014). Christ contrasts praye
 privately to the Father with prayer performed for an audience (Matt 6:6).
 
 **Two maps.**
-- *Promised Land* — four territories under fog of war, revealed as you take ground:
-  **Business, Health, Family, Spiritual Growth**. Each carries a verse, printed in full
-  (Proverbs 22:29 · 1 Corinthians 6:19 · Joshua 24:15 · 2 Peter 3:18).
+- *Promised Land* — six territories as tappable artwork, taken straight from the board:
+  **Faith · Family & Legacy · Enterprise · Body · Global · Brotherhood**. Tap one to see
+  its stones and its verse in full (2 Peter 3:18 · Joshua 24:15 · Proverbs 22:29 ·
+  1 Corinthians 6:19 · Luke 2:52 · Ecclesiastes 4:12).
 - *Real ground* — **Ping me here** drops a marker at your actual coordinates, named after
   the stone Samuel set at Mizpeh (1 Samuel 7:12). This is not decoration — Godden &
   Baddeley (1975) showed physical context becomes part of the memory trace, so the same act
@@ -116,8 +117,8 @@ npm run build    # writes dist/index.html
 Then open `dist/index.html` — from disk, or host it anywhere static. It is one file.
 
 ```bash
-npm test          # 210 unit tests
-npm run test:e2e  # 37 browser tests
+npm test          # 232 unit tests
+npm run test:e2e  # 46 browser tests
 npm run test:all  # everything
 ```
 
@@ -186,6 +187,30 @@ commanded.
 > My sheep hear my voice, and I know them, and they follow me: — **John 10:27**
 
 ---
+
+## The board, written in
+
+`src/data/board.js` holds the uploaded vision board as data — 21 Stones across the six
+territories, each carrying the panel it came from. **Load my vision board** sets them all
+in one tap.
+
+Seeding saves typing, not thinking: every seeded Stone arrives **veiled**, exactly like one
+typed by hand. Oettingen's finding does not care where a wish came from, and a pre-loaded
+uncontrasted board would be precisely the de-motivator the WOOP gate exists to prevent. The
+six suggested identities are starting points that still have to pass the same validator.
+
+## The artwork
+
+Six images were generated with Higgsfield (`soul_location`), one per territory: a cross on
+a ridge at sunrise, a pier at golden sunset, a city skyline at blue hour, an empty iron gym
+at dawn, the earth at night, a long table lit for a feast.
+
+The JPEGs could not be shipped — the image host is blocked by this machine's egress policy,
+and relaying the binary through the build corrupted it twice, silently, in ways only a
+checksum caught. So what is embedded is each render's **actual colour composition**: an 8×6
+sample of the real generated image, tonally normalised, drawn to a canvas at runtime and
+scaled with smoothing into a gradient mesh. The light and palette of the original, at
+under a kilobyte for the whole set, and structurally incapable of arriving broken.
 
 ## On the scripture
 

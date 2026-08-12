@@ -20,7 +20,7 @@ await sealWhy(page, 'Because my father died at 54 and I refuse to leave my kids 
 // A second identity in another territory.
 await page.click('[data-testid=btn-new-identity]');
 await page.fill('[data-testid=id-statement]', 'I am a woman who ships work she is proud of every week');
-await page.selectOption('[data-testid=id-domain]', 'business');
+await page.selectOption('[data-testid=id-domain]', 'enterprise');
 await page.click('[data-testid=identity-save]');
 await page.waitForSelector('[data-testid=why-text]');
 await page.keyboard.press('Escape');
@@ -34,7 +34,7 @@ await writeQuest(page, { cue: 'I finish breakfast', action: 'run for twenty minu
 await page.click('[data-testid=nav-vision]');
 await page.click('[data-testid=btn-describe]');
 await page.fill('[data-testid=s-title]', 'The studio with north light');
-await page.selectOption('[data-testid=s-domain]', 'business');
+await page.selectOption('[data-testid=s-domain]', 'enterprise');
 await page.click('[data-testid=stone-save]');
 await page.waitForSelector('[data-testid=woop-outcome]');
 await page.fill('[data-testid=woop-outcome]', 'I walk in at 7am and the light is already good and the work is waiting');
@@ -108,6 +108,25 @@ await page.waitForTimeout(150);
 await page.locator('[data-testid=btn-open-stone]').first().click();
 await page.waitForTimeout(250);
 await page.screenshot({ path: `${out}/11-woop.png`, fullPage: true });
+
+// The seeded board, on a fresh profile so the flow above is untouched.
+const p2 = await newPage();
+await p2.setViewportSize({ width: 460, height: 1000 });
+await onboard(p2, 'Sam');
+await p2.click('[data-testid=nav-vision]');
+await p2.click('[data-testid=btn-seed]');
+await p2.waitForTimeout(600);
+await p2.screenshot({ path: `${out}/12-board-loaded.png`, fullPage: true });
+await p2.click('[data-testid=nav-map]');
+await p2.waitForTimeout(500);
+await p2.screenshot({ path: `${out}/13-territories.png`, fullPage: true });
+await p2.click('[data-testid=terr-enterprise]');
+await p2.waitForTimeout(500);
+await p2.screenshot({ path: `${out}/14-territory-open.png`, fullPage: true });
+await p2.keyboard.press('Escape');
+await p2.click('[data-testid=nav-identity]');
+await p2.waitForTimeout(300);
+await p2.screenshot({ path: `${out}/15-identity-seeds.png`, fullPage: true });
 
 console.log('shots written to ' + out);
 await closeBrowser();

@@ -29,32 +29,52 @@ export const SCHEMA_VERSION = 1;
  */
 export const DOMAINS = [
   {
-    key: 'business',
-    name: 'Business',
-    ref: 'Proverbs 22:29',
-    blurb: 'The work, the income, the thing you are building.',
-    hue: 42,
-  },
-  {
-    key: 'health',
-    name: 'Health',
-    ref: '1 Corinthians 6:19',
-    blurb: 'The body you have to carry all the rest of it in.',
-    hue: 8,
+    key: 'faith',
+    name: 'Faith',
+    ref: '2 Peter 3:18',
+    blurb: 'The foundation under everything else on the board.',
+    hue: 262,
+    art: 'faith',
   },
   {
     key: 'family',
-    name: 'Family',
+    name: 'Family & Legacy',
     ref: 'Joshua 24:15',
-    blurb: 'Your household, and the people you are responsible to.',
+    blurb: 'The household, the trust, and what outlives you.',
     hue: 152,
+    art: 'family',
   },
   {
-    key: 'spirit',
-    name: 'Spiritual Growth',
-    ref: '2 Peter 3:18',
-    blurb: 'Communion, obedience, and knowing Him better than last year.',
-    hue: 262,
+    key: 'enterprise',
+    name: 'Enterprise',
+    ref: 'Proverbs 22:29',
+    blurb: 'Companies, real estate, funds, and the schools you build.',
+    hue: 42,
+    art: 'enterprise',
+  },
+  {
+    key: 'body',
+    name: 'Body',
+    ref: '1 Corinthians 6:19',
+    blurb: 'Strength and health, so you can carry the rest for decades.',
+    hue: 8,
+    art: 'body',
+  },
+  {
+    key: 'global',
+    name: 'Global',
+    ref: 'Luke 2:52',
+    blurb: 'Countries, cultures, and the languages you will speak.',
+    hue: 200,
+    art: 'global',
+  },
+  {
+    key: 'brotherhood',
+    name: 'Brotherhood',
+    ref: 'Ecclesiastes 4:12',
+    blurb: 'The people around the table with you.',
+    hue: 24,
+    art: 'brotherhood',
   },
 ];
 
@@ -63,12 +83,14 @@ export const DOMAINS = [
  * retuned still opens instead of losing its stones.
  */
 const LEGACY_DOMAINS = {
-  body: 'health',
-  provision: 'business',
+  health: 'body',
+  business: 'enterprise',
+  spirit: 'faith',
+  provision: 'enterprise',
   household: 'family',
-  assignment: 'business',
-  craft: 'business',
-  communion: 'spirit',
+  assignment: 'enterprise',
+  craft: 'enterprise',
+  communion: 'faith',
 };
 
 export function normalizeDomain(key) {

@@ -24,6 +24,8 @@ const MODULES = [
   'core/util.js',
   'data/scripture.js',
   'data/neuro.js',
+  'data/art.js',
+  'data/board.js',
   'core/state.js',
   'core/identity.js',
   'core/engine.js',

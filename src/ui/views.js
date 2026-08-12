@@ -8,10 +8,12 @@
 
 import { esc, pct, ago, dayKey } from '../core/util.js';
 import { DOMAINS, domain } from '../core/state.js';
+import { artFor } from '../data/art.js';
 import { PRINCIPLES, PILLARS } from '../data/neuro.js';
 import { SCRIPTURE, verseByRef } from '../data/scripture.js';
 import { IDENTITY_TIERS, NAME_ARCHETYPES, automaticityAt } from '../core/identity.js';
 import { DIFFICULTY, FOCUS_PRESETS, difficulty } from '../core/engine.js';
+import { SEED_STONES, SEED_IDENTITIES, DECLARATION } from '../data/board.js';
 
 // ── shared fragments ──────────────────────────────────────────────────────
 
@@ -25,8 +27,9 @@ import { DIFFICULTY, FOCUS_PRESETS, difficulty } from '../core/engine.js';
 export function verseBlock(v, { small = false, note = true } = {}) {
   if (!v) return '';
   return `<blockquote class="verse${small ? ' sm' : ''}">${esc(v.text)}
-    <span class="ref">${esc(v.ref)} · Authorized (King James) Version</span>
-    ${note && v.context ? `<span class="note"><b>Note from this app:</b> ${esc(v.context)}</span>` : ''}
+    <span class="ref">${esc(v.ref)} · KJV</span>
+    ${note && v.context ? `<details class="note-toggle"><summary>Note from this app</summary>
+      <span class="note">${esc(v.context)}</span></details>` : ''}
   </blockquote>`;
 }
 
@@ -36,18 +39,24 @@ export function domainVerse(key) {
   return d.ref ? verseByRef(d.ref) : null;
 }
 
-export function whyBlock(p, label = 'Why this, now') {
+/**
+ * The mechanism note, collapsed by default.
+ *
+ * It is still one tap away, but the daily screen should be something you
+ * ACT on, not something you read. Process focus beats outcome focus
+ * (Pham & Taylor 1999) — and it also beats reading about process focus.
+ */
+export function whyBlock(p, label = 'Why this works') {
   if (!p) return '';
-  return `<div class="why">
-    <div class="why-head">◈ ${esc(label)}</div>
-    <div class="why-body">${esc(p.mechanic)}</div>
-    <details class="mt8">
-      <summary>The study</summary>
+  return `<details class="why-fold">
+    <summary>◈ ${esc(label)}</summary>
+    <div class="why">
+      <div class="why-body">${esc(p.mechanic)}</div>
       <div class="why-body mt8">${esc(p.finding)}</div>
       <span class="why-cite">${esc(p.source)}</span>
-      <span class="why-cite">System: ${esc(p.system)}</span>
-    </details>
-  </div>`;
+      <span class="why-cite">${esc(p.system)}</span>
+    </div>
+  </details>`;
 }
 
 function domainPill(key) {
@@ -178,6 +187,14 @@ export function visionView(ctx) {
       <button class="btn" data-act="new-stone" data-testid="btn-describe">✎ Describe one instead</button>
       ${board ? `<button class="btn ghost sm ${picking ? 'primary' : ''}" data-act="toggle-pick" data-testid="btn-pick">${picking ? '● Tapping…' : '◎ Tap the board to pin'}</button>` : ''}
     </div>
+    ${state.stones.length === 0 ? `
+      <div class="card tight mt16" style="border-color:var(--gold-dim);background:linear-gradient(160deg,rgba(224,176,84,.09),transparent 60%),var(--ink-2)">
+        <div class="eyebrow" style="color:var(--gold)">Your board, already written</div>
+        <p class="small mut mb0">${SEED_STONES.length} things are named on it, across six territories. Load them in one tap — each arrives veiled, so the gate still applies.</p>
+        <div class="btn-row mt16">
+          <button class="btn primary" data-act="seed-board" data-testid="btn-seed">▣ Load my vision board</button>
+        </div>
+      </div>` : ''}
     ${board ? `
       <div class="board-wrap mt16 ${picking ? 'picking' : ''}" data-act="board-click" data-testid="board-wrap">
         <img src="${esc(board.image)}" alt="Your vision board">
@@ -298,6 +315,16 @@ export function identityView(ctx) {
     ${state.identities.length === 0
       ? `<div class="empty"><div class="big">◈</div>Nothing named yet. Everything else in this game hangs off this.</div>`
       : state.identities.map((i) => identityCard(i, tallies[i.id], ctx)).join('')}
+    ${state.identities.length < SEED_IDENTITIES.length ? `
+      <hr class="sep">
+      <div class="eyebrow">Starting points, one per territory</div>
+      <div class="seed-row">
+        ${SEED_IDENTITIES.map((sd, i) => state.identities.some((x) => x.domain === sd.domain) ? '' : `
+          <button class="seed-chip" data-act="seed-identity" data-i="${i}" data-testid="seed-id-${esc(sd.domain)}">
+            <span class="sc-t">${esc(sd.statement)}</span>
+            <span class="sc-s">${esc(domain(sd.domain).name)} · tap to edit</span>
+          </button>`).join('')}
+      </div>` : ''}
   </div>
 
   <div class="card">
@@ -395,22 +422,20 @@ export function mapView(ctx) {
   </div>
 
   ${mapTab === 'land' ? `
-    <div class="card">
-      <div class="card-head"><h2>Territories</h2></div>
-      ${verseBlock(SCRIPTURE.find((v) => v.ref === 'Joshua 1:3'))}
-      <div class="canvas-wrap"><canvas id="land-canvas" width="900" height="560"></canvas></div>
-      <div class="map-legend">
-        ${DOMAINS.map((d) => `<span><i style="background:hsl(${d.hue} 50% 55%)"></i>${esc(d.name)} · ${territories[d.key]?.done || 0}/${territories[d.key]?.total || 0}</span>`).join('')}
-      </div>
-      <hr class="sep">
-      <div class="eyebrow">A word over each territory</div>
+    <div class="terr-grid" data-testid="terr-grid">
       ${DOMAINS.map((d) => {
-        const v = domainVerse(d.key);
-        return v ? `<div style="margin-bottom:10px">
-          <div class="t" style="color:hsl(${d.hue} 55% 68%)">${esc(d.name)}</div>
-          <div class="tiny mut">${esc(d.blurb)}</div>
-          ${verseBlock(v, { small: true, note: false })}
-        </div>` : '';
+        const t = territories[d.key] || { total: 0, done: 0, kindled: 0 };
+        const frac = t.total ? t.done / t.total : 0;
+        const art = artFor(d.art || d.key, d.hue);
+        return `<button class="terr ${t.total ? '' : 'unclaimed'}" data-act="open-territory" data-domain="${esc(d.key)}" data-testid="terr-${esc(d.key)}">
+          ${art ? `<span class="terr-art" style="background-image:url('${art}')"></span>` : ''}
+          <span class="terr-scrim" style="background:linear-gradient(180deg,transparent 20%,hsla(${d.hue},45%,6%,.92) 100%)"></span>
+          <span class="terr-body">
+            <span class="terr-name">${esc(d.name)}</span>
+            <span class="terr-count">${t.total ? `${t.done}/${t.total}` : 'no stones yet'}</span>
+            <span class="terr-bar"><i style="width:${pct(frac)}%;background:hsl(${d.hue} 65% 58%)"></i></span>
+          </span>
+        </button>`;
       }).join('')}
     </div>
   ` : `

@@ -588,6 +588,117 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ── territory cards (art-forward) ──────────────────────────────────────── */
+
+.terr-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-bottom: 14px;
+}
+.terr {
+  position: relative; display: block; width: 100%;
+  aspect-ratio: 3 / 2; min-height: 118px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; cursor: pointer; padding: 0;
+  background: var(--ink-2); color: var(--text);
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s, box-shadow .18s;
+}
+.terr:hover, .terr:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--gold-dim);
+  box-shadow: 0 10px 28px rgba(0,0,0,.55);
+}
+.terr:active { transform: translateY(0); }
+.terr-art {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1), filter .3s;
+  filter: saturate(.85);
+}
+.terr:hover .terr-art { transform: scale(1.07); filter: saturate(1.05); }
+.terr.unclaimed .terr-art { filter: grayscale(.85) brightness(.45); }
+.terr-scrim { position: absolute; inset: 0; pointer-events: none; }
+.terr-body {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: block; padding: 10px 12px; text-align: left;
+}
+.terr-name {
+  display: block; font-family: var(--serif); font-size: 1.02rem;
+  line-height: 1.15; text-shadow: 0 1px 6px rgba(0,0,0,.8);
+}
+.terr-count {
+  display: block; font-size: .7rem; color: rgba(255,255,255,.72);
+  letter-spacing: .05em; margin-top: 2px;
+}
+.terr-bar {
+  display: block; height: 3px; margin-top: 7px;
+  background: rgba(255,255,255,.18); border-radius: 999px; overflow: hidden;
+}
+.terr-bar > i {
+  display: block; height: 100%; border-radius: 999px;
+  transition: width .6s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ── progressive disclosure ─────────────────────────────────────────────── */
+
+.why-fold { margin-top: 12px; }
+.why-fold > summary {
+  cursor: pointer; list-style: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--water); font-weight: 600;
+  padding: 5px 11px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--ink-3);
+  transition: border-color .15s, color .15s;
+}
+.why-fold > summary::-webkit-details-marker { display: none; }
+.why-fold > summary:hover { border-color: var(--water); color: #7fb0cf; }
+.why-fold[open] > summary { margin-bottom: 9px; border-color: var(--water); }
+.why-fold .why { margin: 0; }
+
+.note-toggle { margin-top: 7px; }
+.note-toggle > summary {
+  cursor: pointer; list-style: none;
+  font-family: var(--sans); font-size: .68rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.note-toggle > summary::-webkit-details-marker { display: none; }
+.note-toggle > summary::before { content: '＋ '; }
+.note-toggle[open] > summary::before { content: '－ '; }
+.note-toggle > summary:hover { color: var(--text-2); }
+.note-toggle .note { margin-top: 5px; }
+
+/* ── the board hero ─────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative; border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--gold-dim); margin-bottom: 14px;
+  min-height: 148px; display: grid; place-items: center; text-align: center;
+}
+.hero-art { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.hero-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,10,16,.45), rgba(8,10,16,.9)); }
+.hero-body { position: relative; padding: 22px 18px; }
+.hero-body h1 { font-family: var(--serif); font-size: 1.42rem; margin-bottom: 6px; }
+
+/* ── seed chips ─────────────────────────────────────────────────────────── */
+
+.seed-row {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.seed-row::-webkit-scrollbar { display: none; }
+.seed-chip {
+  flex: 0 0 auto; max-width: 240px;
+  padding: 9px 13px; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); background: var(--ink-3);
+  cursor: pointer; text-align: left; color: var(--text);
+  transition: border-color .15s, background .15s;
+}
+.seed-chip:hover { border-color: var(--gold-dim); background: var(--ink-4); }
+.seed-chip .sc-t { display: block; font-size: .84rem; font-weight: 500; }
+.seed-chip .sc-s { display: block; font-size: .68rem; color: var(--text-3); margin-top: 2px; }
 </style>
 <div id="root"></div>
 <noscript><div style="padding:40px;font-family:system-ui;color:#e8e6e0;background:#0b0d14">
@@ -1652,6 +1763,381 @@ function principlesForPillar(pillar) {
 }
 
 
+/* ─── data/art.js ─────────────────────────────────────── */
+
+/**
+ * art.js — territory artwork.
+ *
+ * ── HOW THIS ART GOT HERE ─────────────────────────────────────────────────
+ * Six images were generated with Higgsfield (soul_location), one per
+ * territory on the board: a cross on a ridge at sunrise, a pier at golden
+ * sunset, a city skyline at blue hour, an empty iron gym at dawn, the earth
+ * at night, and a long table lit for a feast.
+ *
+ * The JPEGs themselves could not be shipped. The image host is blocked by
+ * this machine's egress policy, and relaying the binary through the build
+ * conversation corrupted it — twice, silently, in ways only a checksum
+ * caught. So rather than ship images that decode to nothing, what is
+ * embedded here is each render's actual COLOUR COMPOSITION: an 8×6 sample
+ * taken from the real generated image, tonally normalised.
+ *
+ * At runtime that grid is drawn to a small canvas and scaled up with
+ * smoothing on, which produces a soft gradient mesh — the light, palette and
+ * balance of the original render, abstracted. Behind a scrim with a title on
+ * it, that is what a card backdrop wants to be anyway.
+ *
+ * The whole set costs under 1 KB, renders at any resolution, and cannot
+ * silently arrive broken: a corrupted hex digit is one cell of a blur.
+ */
+
+/**
+ * 8 columns × 6 rows, row-major, each cell three hex digits (4-bit RGB).
+ * Sampled from the generated renders with a 1% autocontrast cutoff.
+ */
+const ART_GRIDS = {
+  faith:
+    '88c99cbaccbbdbadcadb9b99656a88db9dcacbacca986544224224223223223224224113' +
+    '001000000000000101221111000000000000000000000000000000000000000000000000',
+  family:
+    '989a99ba9b99989879778768b96db7ffdedaca6a85975864641752ca7b95962753643543' +
+    '000000200100001113113002001112311212112112102002102112311212112112002002',
+  enterprise:
+    '04608c08c19d2ae2ae2ae4ad23437918b17a28b29d29d29c222555567456479589579468' +
+    '000222654655666345235455000111222223344444234344000101000000011000101111',
+  body:
+    '999ddd988644322211111001000654865654432321211100000000211310432432100110' +
+    '000000000100433322000211000000000000000000000000000000000000000100210100',
+  global:
+    '000000000000000000000000001111111111222001001001122222222222554111223345' +
+    '000000000000000000000111000000000000000000000000000000000000000000000000',
+  brotherhood:
+    '110010000000000000000000111111111001000000000000444221111111543655222211' +
+    '111222444222221322332443000000222343222010000000000000000122333332221000',
+};
+
+const GRID_W = 8;
+const GRID_H = 6;
+
+/** Parse a grid string into flat RGB bytes for putImageData. */
+function gridToRGBA(grid) {
+  const n = GRID_W * GRID_H;
+  const out = new Uint8ClampedArray(n * 4);
+  for (let i = 0; i < n; i++) {
+    const h = grid.slice(i * 3, i * 3 + 3);
+    // 4-bit per channel, expanded to 8-bit (0xA → 0xAA).
+    const r = parseInt(h[0], 16) * 17;
+    const g = parseInt(h[1], 16) * 17;
+    const b = parseInt(h[2], 16) * 17;
+    out[i * 4] = r;
+    out[i * 4 + 1] = g;
+    out[i * 4 + 2] = b;
+    out[i * 4 + 3] = 255;
+  }
+  return out;
+}
+
+const cache = new Map();
+
+/**
+ * Render a territory's backdrop and return it as a data URI.
+ *
+ * The 8×6 sample is painted to a tiny canvas, then scaled up with smoothing
+ * on so it becomes a continuous gradient mesh rather than visible blocks. A
+ * wash in the territory's own hue ties it to the rest of the interface, and
+ * a vignette keeps the card's title legible over any part of it.
+ *
+ * @param {string} key territory key
+ * @param {number} hue territory hue, for the wash
+ */
+function artFor(key, hue = 42) {
+  const grid = ART_GRIDS[key];
+  if (!grid) return null;
+
+  const cacheKey = `${key}:${hue}`;
+  if (cache.has(cacheKey)) return cache.get(cacheKey);
+  if (typeof document === 'undefined') return null; // node/test environment
+
+  const W = 320, H = 240;
+
+  // 1. The sample, painted at its true tiny size.
+  const small = document.createElement('canvas');
+  small.width = GRID_W;
+  small.height = GRID_H;
+  const sg = small.getContext('2d');
+  const img = sg.createImageData(GRID_W, GRID_H);
+  img.data.set(gridToRGBA(grid));
+  sg.putImageData(img, 0, 0);
+
+  // 2. Scaled up with smoothing — this is what turns 48 cells into a mesh.
+  const c = document.createElement('canvas');
+  c.width = W;
+  c.height = H;
+  const g = c.getContext('2d');
+  g.imageSmoothingEnabled = true;
+  g.imageSmoothingQuality = 'high';
+  g.drawImage(small, 0, 0, W, H);
+
+  // 3. A wash in the territory's hue, so the set reads as one system.
+  g.globalCompositeOperation = 'overlay';
+  g.fillStyle = `hsla(${hue}, 60%, 45%, .28)`;
+  g.fillRect(0, 0, W, H);
+
+  // 4. Deepen the base so light text always holds.
+  g.globalCompositeOperation = 'multiply';
+  const deep = g.createLinearGradient(0, 0, 0, H);
+  deep.addColorStop(0, 'rgba(255,255,255,1)');
+  deep.addColorStop(1, 'rgba(120,120,140,1)');
+  g.fillStyle = deep;
+  g.fillRect(0, 0, W, H);
+
+  // 5. Vignette.
+  g.globalCompositeOperation = 'source-over';
+  const vig = g.createRadialGradient(W / 2, H * 0.42, H * 0.15, W / 2, H / 2, H * 0.95);
+  vig.addColorStop(0, 'rgba(0,0,0,0)');
+  vig.addColorStop(1, 'rgba(4,5,9,.62)');
+  g.fillStyle = vig;
+  g.fillRect(0, 0, W, H);
+
+  const uri = c.toDataURL('image/jpeg', 0.82);
+  cache.set(cacheKey, uri);
+  return uri;
+}
+
+/** Structural check — grids must be complete and pure hex. */
+function verifyArt() {
+  const problems = [];
+  const want = GRID_W * GRID_H * 3;
+  for (const [key, grid] of Object.entries(ART_GRIDS)) {
+    if (grid.length !== want) {
+      problems.push(`${key}: grid is ${grid.length} chars, expected ${want}`);
+    }
+    if (!/^[0-9a-f]+$/.test(grid)) {
+      problems.push(`${key}: grid contains non-hex characters`);
+    }
+  }
+  return problems;
+}
+
+
+/* ─── data/board.js ─────────────────────────────────────── */
+
+/**
+ * board.js — the player's actual vision board, written in.
+ *
+ * Every Stone here comes from a real panel on the uploaded board. Nothing is
+ * invented and nothing is editorialised: the titles are the things named on
+ * the board, and the `note` is the board's own description of that panel.
+ *
+ * These arrive VEILED, like every other Stone. Seeding them does not skip the
+ * WOOP gate — Oettingen's finding does not care where a wish came from, and a
+ * pre-loaded uncontrasted board would be exactly the de-motivator the gate
+ * exists to prevent. What seeding removes is typing, not thinking.
+ *
+ * Each suggested identity is a STARTING POINT the player edits or replaces.
+ * It still has to pass validateIdentity() like anything typed by hand.
+ */
+
+const BOARD_TITLE = 'Faith. Family. Freedom. Financial Abundance. Global Impact. Legacy.';
+
+/** Suggested identities, one per territory. Editable, and validated normally. */
+const SEED_IDENTITIES = [
+  {
+    domain: 'faith',
+    statement: 'I am a man who keeps God at the center of what he builds',
+    prompt: 'The board says faith is the foundation of everything. What does that look like on a Tuesday?',
+  },
+  {
+    domain: 'family',
+    statement: 'I am a man who builds what will outlive him',
+    prompt: 'The board says the goal is not to become successful, but to build something that impacts generations.',
+  },
+  {
+    domain: 'enterprise',
+    statement: 'I am a man who builds companies that solve real problems',
+    prompt: 'Robotics, eVTOL, mecha, real estate, funds, schools. What is the daily behaviour underneath all of it?',
+  },
+  {
+    domain: 'body',
+    statement: 'I am a man who trains because his body carries an assignment',
+    prompt: 'The board says the goal is not appearance — it is discipline, endurance, and longevity.',
+  },
+  {
+    domain: 'global',
+    statement: 'I am a man who studies a language every day',
+    prompt: 'Twenty-plus languages is not a wish, it is a daily rep repeated for years.',
+  },
+  {
+    domain: 'brotherhood',
+    statement: 'I am a man who gathers people and keeps them',
+    prompt: 'The board says success means little without people to share it with.',
+  },
+];
+
+/**
+ * The Stones. `panel` names where each one sits on the board so the player
+ * can match them up when they tap their own image.
+ */
+const SEED_STONES = [
+  // ── FAITH ──────────────────────────────────────────────────────────────
+  {
+    domain: 'faith',
+    title: 'Faith as the foundation, growing every day',
+    panel: 'FAITH IS MY FOUNDATION',
+    note: 'God at the center of life, family, businesses, investments, relationships, health and future.',
+  },
+
+  // ── FAMILY & LEGACY ────────────────────────────────────────────────────
+  {
+    domain: 'family',
+    title: 'The family trust, built to last for generations',
+    panel: 'MY FAMILY & OUR TRUST FUND',
+    note: 'Businesses, investments, intellectual property, real estate and funds held through structures designed for long-term stewardship.',
+  },
+  {
+    domain: 'family',
+    title: 'A strong, loving household',
+    panel: 'OUR LEGACY. OUR FREEDOM. OUR IMPACT.',
+    note: 'A life centered on faith, love, trust, purpose and generational impact.',
+  },
+
+  // ── ENTERPRISE: real estate ────────────────────────────────────────────
+  {
+    domain: 'enterprise',
+    title: 'Retail commercial real estate in strong markets',
+    panel: 'MULTIPLE PROPERTIES IN CRE — RETAIL',
+    note: 'High-quality retail property.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'Industrial property: warehouses, manufacturing, logistics',
+    panel: 'MULTIPLE PROPERTIES IN CRE — INDUSTRIAL',
+    note: 'Productive real estate that supports the operating businesses.',
+  },
+  {
+    domain: 'enterprise',
+    title: '20+ rental and multifamily properties across countries',
+    panel: '20+ RENTING & MULTIFAMILY',
+    note: 'USA, Canada, UK, Germany, UAE, Australia, Singapore, Japan, France and other markets.',
+  },
+
+  // ── ENTERPRISE: the three technology companies ─────────────────────────
+  {
+    domain: 'enterprise',
+    title: 'The robotics company',
+    panel: 'I OWN VARIOUS SUCCESSFUL BUSINESSES — ROBOTICS',
+    note: 'Designing and manufacturing advanced robotic systems.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'The eVTOL company',
+    panel: 'I OWN VARIOUS SUCCESSFUL BUSINESSES — eVTOL',
+    note: 'Next-generation electric vertical takeoff and landing aircraft.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'Giant robotics and mecha manufacturing',
+    panel: 'GUNDAM-LIKE ROBOTS MANUFACTURING WAREHOUSE',
+    note: 'Industrial mechs, advanced vehicles and next-generation robotic systems, with the facilities to research, test and produce them.',
+  },
+
+  // ── ENTERPRISE: the funds ──────────────────────────────────────────────
+  {
+    domain: 'enterprise',
+    title: 'The venture capital fund',
+    panel: 'I OWN MY FUNDS — VC',
+    note: 'Backing ambitious founders building technologies that shape the future.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'The private equity arm',
+    panel: 'I OWN MY FUNDS — PE',
+    note: 'Acquire, improve, grow and hold strong businesses.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'The private credit book',
+    panel: 'I OWN MY FUNDS — PRIVATE CREDIT',
+    note: 'Capital to businesses, entrepreneurs, developers and investors.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'The family office',
+    panel: 'I OWN MY FUNDS — FAMILY OFFICE',
+    note: 'Managing the family’s investments, companies, real estate, philanthropy and long-term wealth.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'Philanthropy that opens doors for people',
+    panel: 'I OWN MY FUNDS — PHILANTHROPY',
+    note: 'Communities, education, innovation, humanitarian work and people who need opportunity.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'Regenerative finance',
+    panel: 'I OWN MY FUNDS — REGENERATIVE FINANCE',
+    note: 'Systems that improve communities, ecosystems, infrastructure and long-term economic sustainability.',
+  },
+  {
+    domain: 'enterprise',
+    title: 'Hard money and private lending',
+    panel: 'I OWN MY FUNDS — HARD MONEY',
+    note: 'Strategic capital for qualified real estate investors, operators and projects.',
+  },
+
+  // ── ENTERPRISE: education ──────────────────────────────────────────────
+  {
+    domain: 'enterprise',
+    title: 'Schools that grow the next generation of builders',
+    panel: 'I OWN EDUCATION INSTITUTIONS',
+    note: 'Entrepreneurship, innovation, leadership, technology and AI, finance and investing, global minds and impact. Educate. Empower. Elevate.',
+  },
+
+  // ── BODY ───────────────────────────────────────────────────────────────
+  {
+    domain: 'body',
+    title: 'A body built for discipline, strength and longevity',
+    panel: 'SUPER-SOLDIER BODY',
+    note: 'Strong body. Strong mind. Strong purpose. Not appearance — capacity to keep serving for decades.',
+  },
+
+  // ── GLOBAL ─────────────────────────────────────────────────────────────
+  {
+    domain: 'global',
+    title: 'Live in Shanghai, spend real time in South Korea',
+    panel: 'I TRAVEL THE WORLD',
+    note: 'Experience cultures, industries, food, architecture and ways of life firsthand.',
+  },
+  {
+    domain: 'global',
+    title: 'Speak more than 20 languages',
+    panel: 'I SPEAK OVER 20 LANGUAGES',
+    note: 'Mandarin, Korean, Japanese, Spanish, French, German, Arabic, Hindi, Portuguese, Russian and more.',
+  },
+
+  // ── BROTHERHOOD ────────────────────────────────────────────────────────
+  {
+    domain: 'brotherhood',
+    title: 'A table that stays full',
+    panel: 'GRATEFUL HEART. STRONG FAITH. UNBREAKABLE BONDS.',
+    note: 'Family, trusted friends, mentors and partners. We eat, celebrate, pray, challenge and build together.',
+  },
+];
+
+/** The seven principles written down the right-hand side of the board. */
+const PRINCIPLES_STRIP = [
+  { key: 'vision', label: 'Vision', line: 'Know where I am going.' },
+  { key: 'plan', label: 'Plan', line: 'Turn the vision into measurable goals.' },
+  { key: 'execute', label: 'Execute', line: 'Take consistent action.' },
+  { key: 'discipline', label: 'Discipline', line: 'Continue even when motivation changes.' },
+  { key: 'faith', label: 'Faith', line: 'Trust God while doing the work in front of me.' },
+  { key: 'success', label: 'Success', line: 'Become capable of carrying greater responsibility.' },
+  { key: 'legacy', label: 'Legacy', line: 'Build something worth passing forward.' },
+];
+
+/** The declaration under the board. Shown once, on the opening screen. */
+const DECLARATION = 'I build. I invest. I impact. I create legacy.';
+
+
 /* ─── core/state.js ─────────────────────────────────────── */
 
 /**
@@ -1683,32 +2169,52 @@ const SCHEMA_VERSION = 1;
  */
 const DOMAINS = [
   {
-    key: 'business',
-    name: 'Business',
-    ref: 'Proverbs 22:29',
-    blurb: 'The work, the income, the thing you are building.',
-    hue: 42,
-  },
-  {
-    key: 'health',
-    name: 'Health',
-    ref: '1 Corinthians 6:19',
-    blurb: 'The body you have to carry all the rest of it in.',
-    hue: 8,
+    key: 'faith',
+    name: 'Faith',
+    ref: '2 Peter 3:18',
+    blurb: 'The foundation under everything else on the board.',
+    hue: 262,
+    art: 'faith',
   },
   {
     key: 'family',
-    name: 'Family',
+    name: 'Family & Legacy',
     ref: 'Joshua 24:15',
-    blurb: 'Your household, and the people you are responsible to.',
+    blurb: 'The household, the trust, and what outlives you.',
     hue: 152,
+    art: 'family',
   },
   {
-    key: 'spirit',
-    name: 'Spiritual Growth',
-    ref: '2 Peter 3:18',
-    blurb: 'Communion, obedience, and knowing Him better than last year.',
-    hue: 262,
+    key: 'enterprise',
+    name: 'Enterprise',
+    ref: 'Proverbs 22:29',
+    blurb: 'Companies, real estate, funds, and the schools you build.',
+    hue: 42,
+    art: 'enterprise',
+  },
+  {
+    key: 'body',
+    name: 'Body',
+    ref: '1 Corinthians 6:19',
+    blurb: 'Strength and health, so you can carry the rest for decades.',
+    hue: 8,
+    art: 'body',
+  },
+  {
+    key: 'global',
+    name: 'Global',
+    ref: 'Luke 2:52',
+    blurb: 'Countries, cultures, and the languages you will speak.',
+    hue: 200,
+    art: 'global',
+  },
+  {
+    key: 'brotherhood',
+    name: 'Brotherhood',
+    ref: 'Ecclesiastes 4:12',
+    blurb: 'The people around the table with you.',
+    hue: 24,
+    art: 'brotherhood',
   },
 ];
 
@@ -1717,12 +2223,14 @@ const DOMAINS = [
  * retuned still opens instead of losing its stones.
  */
 const LEGACY_DOMAINS = {
-  body: 'health',
-  provision: 'business',
+  health: 'body',
+  business: 'enterprise',
+  spirit: 'faith',
+  provision: 'enterprise',
   household: 'family',
-  assignment: 'business',
-  craft: 'business',
-  communion: 'spirit',
+  assignment: 'enterprise',
+  craft: 'enterprise',
+  communion: 'faith',
 };
 
 function normalizeDomain(key) {
@@ -3818,6 +4326,8 @@ function buildRecap(state, read = readState(state)) {
 
 
 
+
+
 // ── shared fragments ──────────────────────────────────────────────────────
 
 /**
@@ -3830,8 +4340,9 @@ function buildRecap(state, read = readState(state)) {
 function verseBlock(v, { small = false, note = true } = {}) {
   if (!v) return '';
   return `<blockquote class="verse${small ? ' sm' : ''}">${esc(v.text)}
-    <span class="ref">${esc(v.ref)} · Authorized (King James) Version</span>
-    ${note && v.context ? `<span class="note"><b>Note from this app:</b> ${esc(v.context)}</span>` : ''}
+    <span class="ref">${esc(v.ref)} · KJV</span>
+    ${note && v.context ? `<details class="note-toggle"><summary>Note from this app</summary>
+      <span class="note">${esc(v.context)}</span></details>` : ''}
   </blockquote>`;
 }
 
@@ -3841,18 +4352,24 @@ function domainVerse(key) {
   return d.ref ? verseByRef(d.ref) : null;
 }
 
-function whyBlock(p, label = 'Why this, now') {
+/**
+ * The mechanism note, collapsed by default.
+ *
+ * It is still one tap away, but the daily screen should be something you
+ * ACT on, not something you read. Process focus beats outcome focus
+ * (Pham & Taylor 1999) — and it also beats reading about process focus.
+ */
+function whyBlock(p, label = 'Why this works') {
   if (!p) return '';
-  return `<div class="why">
-    <div class="why-head">◈ ${esc(label)}</div>
-    <div class="why-body">${esc(p.mechanic)}</div>
-    <details class="mt8">
-      <summary>The study</summary>
+  return `<details class="why-fold">
+    <summary>◈ ${esc(label)}</summary>
+    <div class="why">
+      <div class="why-body">${esc(p.mechanic)}</div>
       <div class="why-body mt8">${esc(p.finding)}</div>
       <span class="why-cite">${esc(p.source)}</span>
-      <span class="why-cite">System: ${esc(p.system)}</span>
-    </details>
-  </div>`;
+      <span class="why-cite">${esc(p.system)}</span>
+    </div>
+  </details>`;
 }
 
 function domainPill(key) {
@@ -3983,6 +4500,14 @@ function visionView(ctx) {
       <button class="btn" data-act="new-stone" data-testid="btn-describe">✎ Describe one instead</button>
       ${board ? `<button class="btn ghost sm ${picking ? 'primary' : ''}" data-act="toggle-pick" data-testid="btn-pick">${picking ? '● Tapping…' : '◎ Tap the board to pin'}</button>` : ''}
     </div>
+    ${state.stones.length === 0 ? `
+      <div class="card tight mt16" style="border-color:var(--gold-dim);background:linear-gradient(160deg,rgba(224,176,84,.09),transparent 60%),var(--ink-2)">
+        <div class="eyebrow" style="color:var(--gold)">Your board, already written</div>
+        <p class="small mut mb0">${SEED_STONES.length} things are named on it, across six territories. Load them in one tap — each arrives veiled, so the gate still applies.</p>
+        <div class="btn-row mt16">
+          <button class="btn primary" data-act="seed-board" data-testid="btn-seed">▣ Load my vision board</button>
+        </div>
+      </div>` : ''}
     ${board ? `
       <div class="board-wrap mt16 ${picking ? 'picking' : ''}" data-act="board-click" data-testid="board-wrap">
         <img src="${esc(board.image)}" alt="Your vision board">
@@ -4103,6 +4628,16 @@ function identityView(ctx) {
     ${state.identities.length === 0
       ? `<div class="empty"><div class="big">◈</div>Nothing named yet. Everything else in this game hangs off this.</div>`
       : state.identities.map((i) => identityCard(i, tallies[i.id], ctx)).join('')}
+    ${state.identities.length < SEED_IDENTITIES.length ? `
+      <hr class="sep">
+      <div class="eyebrow">Starting points, one per territory</div>
+      <div class="seed-row">
+        ${SEED_IDENTITIES.map((sd, i) => state.identities.some((x) => x.domain === sd.domain) ? '' : `
+          <button class="seed-chip" data-act="seed-identity" data-i="${i}" data-testid="seed-id-${esc(sd.domain)}">
+            <span class="sc-t">${esc(sd.statement)}</span>
+            <span class="sc-s">${esc(domain(sd.domain).name)} · tap to edit</span>
+          </button>`).join('')}
+      </div>` : ''}
   </div>
 
   <div class="card">
@@ -4200,22 +4735,20 @@ function mapView(ctx) {
   </div>
 
   ${mapTab === 'land' ? `
-    <div class="card">
-      <div class="card-head"><h2>Territories</h2></div>
-      ${verseBlock(SCRIPTURE.find((v) => v.ref === 'Joshua 1:3'))}
-      <div class="canvas-wrap"><canvas id="land-canvas" width="900" height="560"></canvas></div>
-      <div class="map-legend">
-        ${DOMAINS.map((d) => `<span><i style="background:hsl(${d.hue} 50% 55%)"></i>${esc(d.name)} · ${territories[d.key]?.done || 0}/${territories[d.key]?.total || 0}</span>`).join('')}
-      </div>
-      <hr class="sep">
-      <div class="eyebrow">A word over each territory</div>
+    <div class="terr-grid" data-testid="terr-grid">
       ${DOMAINS.map((d) => {
-        const v = domainVerse(d.key);
-        return v ? `<div style="margin-bottom:10px">
-          <div class="t" style="color:hsl(${d.hue} 55% 68%)">${esc(d.name)}</div>
-          <div class="tiny mut">${esc(d.blurb)}</div>
-          ${verseBlock(v, { small: true, note: false })}
-        </div>` : '';
+        const t = territories[d.key] || { total: 0, done: 0, kindled: 0 };
+        const frac = t.total ? t.done / t.total : 0;
+        const art = artFor(d.art || d.key, d.hue);
+        return `<button class="terr ${t.total ? '' : 'unclaimed'}" data-act="open-territory" data-domain="${esc(d.key)}" data-testid="terr-${esc(d.key)}">
+          ${art ? `<span class="terr-art" style="background-image:url('${art}')"></span>` : ''}
+          <span class="terr-scrim" style="background:linear-gradient(180deg,transparent 20%,hsla(${d.hue},45%,6%,.92) 100%)"></span>
+          <span class="terr-body">
+            <span class="terr-name">${esc(d.name)}</span>
+            <span class="terr-count">${t.total ? `${t.done}/${t.total}` : 'no stones yet'}</span>
+            <span class="terr-bar"><i style="width:${pct(frac)}%;background:hsl(${d.hue} 65% 58%)"></i></span>
+          </span>
+        </button>`;
       }).join('')}
     </div>
   ` : `
@@ -4681,6 +5214,8 @@ const V = { verseBlock, domainVerse, whyBlock, todayView, visionView, woopModal,
  * The controller. Loads state, decides what to show, draws the maps and the
  * chart, and owns every user action.
  */
+
+
 
 
 
@@ -5574,6 +6109,95 @@ const actions = {
   // ── map ──
   'map-tab'(el) { App.mapTab = el.dataset.tab; render(); },
 
+  'open-territory'(el) {
+    const key = el.dataset.domain;
+    const d = domain(key);
+    const stones = App.state.stones.filter((s) => s.domain === key);
+    const art = artFor(d.art || d.key, d.hue);
+    const verse = d.ref ? verseByRef(d.ref) : null;
+    openModal(`
+      ${art ? `<div class="hero" style="margin:-22px -22px 16px;border-radius:0">
+        <div class="hero-art" style="background-image:url('${art}')"></div>
+        <div class="hero-scrim"></div>
+        <div class="hero-body"><h1>${esc(d.name)}</h1>
+          <div class="small mut">${esc(d.blurb)}</div></div>
+      </div>` : `<h2>${esc(d.name)}</h2>`}
+      ${verse ? V.verseBlock(verse) : ''}
+      <div class="card-head mt16"><h3>Stones here</h3><span class="spacer"></span>
+        <span class="pill">${stones.length}</span></div>
+      ${stones.length === 0
+        ? `<div class="empty">Nothing set in this territory yet.</div>`
+        : stones.map((st) => {
+            const p = stoneProgress(st, App.state.quests);
+            return `<div class="row">
+              <div class="grow">
+                <div class="t">${esc(st.title)}</div>
+                <div class="s">${st.woopComplete ? `${p.done}/${p.total} steps` : 'veiled — count the cost'}</div>
+              </div>
+              <button class="btn sm" data-act="open-stone" data-stone="${esc(st.id)}">${st.woopComplete ? 'Open' : 'Kindle'}</button>
+            </div>`;
+          }).join('')}
+      <div class="btn-row mt16">
+        <button class="btn primary" data-act="new-stone-in" data-domain="${esc(key)}">+ Set a stone here</button>
+        <button class="btn ghost" data-act="close-modal">Close</button>
+      </div>`);
+  },
+
+  'new-stone-in'(el) {
+    closeModal();
+    openStoneComposer({ domain: el.dataset.domain });
+  },
+
+  /**
+   * Load the board that was uploaded, as Stones.
+   *
+   * They arrive VEILED like anything else. Seeding saves typing, not the
+   * WOOP gate — a pre-loaded uncontrasted board is exactly the de-motivator
+   * Oettingen measured, and it would not matter that the app typed it.
+   */
+  'seed-board'() {
+    const state = App.state;
+    const existing = new Set(state.stones.map((s) => s.title));
+    let added = 0;
+    for (const seed of SEED_STONES) {
+      if (existing.has(seed.title)) continue;
+      const stone = addStone(state, { title: seed.title, domain: seed.domain });
+      stone.panel = seed.panel;
+      stone.note = seed.note;
+      added++;
+    }
+    chronicle(state, {
+      kind: 'board',
+      title: `The vision was written — ${added} stones`,
+      body: `${BOARD_TITLE} Every one arrives veiled. Count the cost on one and it kindles.`,
+      refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
+    });
+    persist();
+    App.view = 'vision';
+    render();
+    toast(`${added} stones set. Kindle the one that matters most.`, 'gold');
+  },
+
+  'seed-identity'(el) {
+    const seed = SEED_IDENTITIES[Number(el.dataset.i)];
+    if (!seed) return;
+    openModal(`
+      <div class="eyebrow">Be · ${esc(domain(seed.domain).name)}</div>
+      <h2>Who are you becoming here?</h2>
+      <p class="small mut">${esc(seed.prompt)}</p>
+      <div class="field">
+        <label for="id-statement">Edit this until it is true to you</label>
+        <input type="text" id="id-statement" value="${esc(seed.statement)}" data-testid="id-statement">
+        <div class="hint">It still has to pass the same test as anything you type from scratch: present tense, and a behaviour someone could watch.</div>
+      </div>
+      <input type="hidden" id="id-domain" value="${esc(seed.domain)}">
+      <div id="id-errors"></div>
+      <div class="btn-row mt16">
+        <button class="btn primary" data-act="identity-save" data-testid="identity-save">Name it</button>
+        <button class="btn ghost" data-act="close-modal">Cancel</button>
+      </div>`);
+  },
+
   'ping-me'() {
     if (!navigator.geolocation) return toast('This device will not share a location.', 'bad');
     toast('Finding you…');
@@ -5759,7 +6383,7 @@ function openStoneComposer(meta) {
     <div class="field">
       <label for="s-domain">Territory</label>
       <select id="s-domain" data-testid="s-domain">
-        ${DOMAINS.map((d) => `<option value="${d.key}">${d.name}</option>`).join('')}
+        ${DOMAINS.map((d) => `<option value="${d.key}" ${meta.domain === d.key ? 'selected' : ''}>${d.name}</option>`).join('')}
       </select>
     </div>
     <div class="field">

@@ -583,3 +583,114 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* ── territory cards (art-forward) ──────────────────────────────────────── */
+
+.terr-grid {
+  display: grid; gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin-bottom: 14px;
+}
+.terr {
+  position: relative; display: block; width: 100%;
+  aspect-ratio: 3 / 2; min-height: 118px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  overflow: hidden; cursor: pointer; padding: 0;
+  background: var(--ink-2); color: var(--text);
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s, box-shadow .18s;
+}
+.terr:hover, .terr:focus-visible {
+  transform: translateY(-3px);
+  border-color: var(--gold-dim);
+  box-shadow: 0 10px 28px rgba(0,0,0,.55);
+}
+.terr:active { transform: translateY(0); }
+.terr-art {
+  position: absolute; inset: 0;
+  background-size: cover; background-position: center;
+  transition: transform .5s cubic-bezier(.2,.8,.2,1), filter .3s;
+  filter: saturate(.85);
+}
+.terr:hover .terr-art { transform: scale(1.07); filter: saturate(1.05); }
+.terr.unclaimed .terr-art { filter: grayscale(.85) brightness(.45); }
+.terr-scrim { position: absolute; inset: 0; pointer-events: none; }
+.terr-body {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: block; padding: 10px 12px; text-align: left;
+}
+.terr-name {
+  display: block; font-family: var(--serif); font-size: 1.02rem;
+  line-height: 1.15; text-shadow: 0 1px 6px rgba(0,0,0,.8);
+}
+.terr-count {
+  display: block; font-size: .7rem; color: rgba(255,255,255,.72);
+  letter-spacing: .05em; margin-top: 2px;
+}
+.terr-bar {
+  display: block; height: 3px; margin-top: 7px;
+  background: rgba(255,255,255,.18); border-radius: 999px; overflow: hidden;
+}
+.terr-bar > i {
+  display: block; height: 100%; border-radius: 999px;
+  transition: width .6s cubic-bezier(.2,.8,.2,1);
+}
+
+/* ── progressive disclosure ─────────────────────────────────────────────── */
+
+.why-fold { margin-top: 12px; }
+.why-fold > summary {
+  cursor: pointer; list-style: none;
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .72rem; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--water); font-weight: 600;
+  padding: 5px 11px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--ink-3);
+  transition: border-color .15s, color .15s;
+}
+.why-fold > summary::-webkit-details-marker { display: none; }
+.why-fold > summary:hover { border-color: var(--water); color: #7fb0cf; }
+.why-fold[open] > summary { margin-bottom: 9px; border-color: var(--water); }
+.why-fold .why { margin: 0; }
+
+.note-toggle { margin-top: 7px; }
+.note-toggle > summary {
+  cursor: pointer; list-style: none;
+  font-family: var(--sans); font-size: .68rem;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--text-3);
+}
+.note-toggle > summary::-webkit-details-marker { display: none; }
+.note-toggle > summary::before { content: '＋ '; }
+.note-toggle[open] > summary::before { content: '－ '; }
+.note-toggle > summary:hover { color: var(--text-2); }
+.note-toggle .note { margin-top: 5px; }
+
+/* ── the board hero ─────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative; border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--gold-dim); margin-bottom: 14px;
+  min-height: 148px; display: grid; place-items: center; text-align: center;
+}
+.hero-art { position: absolute; inset: 0; background-size: cover; background-position: center; }
+.hero-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,10,16,.45), rgba(8,10,16,.9)); }
+.hero-body { position: relative; padding: 22px 18px; }
+.hero-body h1 { font-family: var(--serif); font-size: 1.42rem; margin-bottom: 6px; }
+
+/* ── seed chips ─────────────────────────────────────────────────────────── */
+
+.seed-row {
+  display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px;
+  scrollbar-width: none;
+}
+.seed-row::-webkit-scrollbar { display: none; }
+.seed-chip {
+  flex: 0 0 auto; max-width: 240px;
+  padding: 9px 13px; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); background: var(--ink-3);
+  cursor: pointer; text-align: left; color: var(--text);
+  transition: border-color .15s, background .15s;
+}
+.seed-chip:hover { border-color: var(--gold-dim); background: var(--ink-4); }
+.seed-chip .sc-t { display: block; font-size: .84rem; font-weight: 500; }
+.seed-chip .sc-s { display: block; font-size: .68rem; color: var(--text-3); margin-top: 2px; }

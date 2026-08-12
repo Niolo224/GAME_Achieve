@@ -23,6 +23,8 @@ import { validateIdentity, tallyIdentity, evidenceStatement, automaticityAt } fr
 import { readState, nextStep, wordForToday, accomplishmentNote, buildRecap } from './core/guide.js';
 import { runGrowth, buildSeries, explainRate, displayTerms } from './core/growth.js';
 import { verseFor, verseByRef } from './data/scripture.js';
+import { SEED_STONES, SEED_IDENTITIES, BOARD_TITLE, DECLARATION } from './data/board.js';
+import { artFor } from './data/art.js';
 import { principle } from './data/neuro.js';
 import * as V from './ui/views.js';
 
@@ -909,6 +911,95 @@ const actions = {
   // ── map ──
   'map-tab'(el) { App.mapTab = el.dataset.tab; render(); },
 
+  'open-territory'(el) {
+    const key = el.dataset.domain;
+    const d = domain(key);
+    const stones = App.state.stones.filter((s) => s.domain === key);
+    const art = artFor(d.art || d.key, d.hue);
+    const verse = d.ref ? verseByRef(d.ref) : null;
+    openModal(`
+      ${art ? `<div class="hero" style="margin:-22px -22px 16px;border-radius:0">
+        <div class="hero-art" style="background-image:url('${art}')"></div>
+        <div class="hero-scrim"></div>
+        <div class="hero-body"><h1>${esc(d.name)}</h1>
+          <div class="small mut">${esc(d.blurb)}</div></div>
+      </div>` : `<h2>${esc(d.name)}</h2>`}
+      ${verse ? V.verseBlock(verse) : ''}
+      <div class="card-head mt16"><h3>Stones here</h3><span class="spacer"></span>
+        <span class="pill">${stones.length}</span></div>
+      ${stones.length === 0
+        ? `<div class="empty">Nothing set in this territory yet.</div>`
+        : stones.map((st) => {
+            const p = stoneProgress(st, App.state.quests);
+            return `<div class="row">
+              <div class="grow">
+                <div class="t">${esc(st.title)}</div>
+                <div class="s">${st.woopComplete ? `${p.done}/${p.total} steps` : 'veiled — count the cost'}</div>
+              </div>
+              <button class="btn sm" data-act="open-stone" data-stone="${esc(st.id)}">${st.woopComplete ? 'Open' : 'Kindle'}</button>
+            </div>`;
+          }).join('')}
+      <div class="btn-row mt16">
+        <button class="btn primary" data-act="new-stone-in" data-domain="${esc(key)}">+ Set a stone here</button>
+        <button class="btn ghost" data-act="close-modal">Close</button>
+      </div>`);
+  },
+
+  'new-stone-in'(el) {
+    closeModal();
+    openStoneComposer({ domain: el.dataset.domain });
+  },
+
+  /**
+   * Load the board that was uploaded, as Stones.
+   *
+   * They arrive VEILED like anything else. Seeding saves typing, not the
+   * WOOP gate — a pre-loaded uncontrasted board is exactly the de-motivator
+   * Oettingen measured, and it would not matter that the app typed it.
+   */
+  'seed-board'() {
+    const state = App.state;
+    const existing = new Set(state.stones.map((s) => s.title));
+    let added = 0;
+    for (const seed of SEED_STONES) {
+      if (existing.has(seed.title)) continue;
+      const stone = addStone(state, { title: seed.title, domain: seed.domain });
+      stone.panel = seed.panel;
+      stone.note = seed.note;
+      added++;
+    }
+    chronicle(state, {
+      kind: 'board',
+      title: `The vision was written — ${added} stones`,
+      body: `${BOARD_TITLE} Every one arrives veiled. Count the cost on one and it kindles.`,
+      refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
+    });
+    persist();
+    App.view = 'vision';
+    render();
+    toast(`${added} stones set. Kindle the one that matters most.`, 'gold');
+  },
+
+  'seed-identity'(el) {
+    const seed = SEED_IDENTITIES[Number(el.dataset.i)];
+    if (!seed) return;
+    openModal(`
+      <div class="eyebrow">Be · ${esc(domain(seed.domain).name)}</div>
+      <h2>Who are you becoming here?</h2>
+      <p class="small mut">${esc(seed.prompt)}</p>
+      <div class="field">
+        <label for="id-statement">Edit this until it is true to you</label>
+        <input type="text" id="id-statement" value="${esc(seed.statement)}" data-testid="id-statement">
+        <div class="hint">It still has to pass the same test as anything you type from scratch: present tense, and a behaviour someone could watch.</div>
+      </div>
+      <input type="hidden" id="id-domain" value="${esc(seed.domain)}">
+      <div id="id-errors"></div>
+      <div class="btn-row mt16">
+        <button class="btn primary" data-act="identity-save" data-testid="identity-save">Name it</button>
+        <button class="btn ghost" data-act="close-modal">Cancel</button>
+      </div>`);
+  },
+
   'ping-me'() {
     if (!navigator.geolocation) return toast('This device will not share a location.', 'bad');
     toast('Finding you…');
@@ -1094,7 +1185,7 @@ function openStoneComposer(meta) {
     <div class="field">
       <label for="s-domain">Territory</label>
       <select id="s-domain" data-testid="s-domain">
-        ${DOMAINS.map((d) => `<option value="${d.key}">${d.name}</option>`).join('')}
+        ${DOMAINS.map((d) => `<option value="${d.key}" ${meta.domain === d.key ? 'selected' : ''}>${d.name}</option>`).join('')}
       </select>
     </div>
     <div class="field">

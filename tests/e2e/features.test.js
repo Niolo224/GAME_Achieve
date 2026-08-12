@@ -99,7 +99,9 @@ describe('the real map', () => {
     await page.click('[data-testid=btn-ping-me]');
     await page.waitForTimeout(700);
     await page.click('[data-testid=tab-land]');
+    await page.waitForTimeout(120);
     await page.click('[data-testid=tab-earth]');
+    await page.waitForTimeout(250);
     const painted = await page.evaluate(() => {
       const c = document.getElementById('earth-canvas');
       const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
@@ -407,6 +409,140 @@ describe('REGRESSION: a re-render must not disarm the Why gate', () => {
     await page.waitForTimeout(200);
     const state = await readAppState(page);
     assert.equal(state.quests[0].completedAt, null, 'the DOM must never be the source of truth for the gate');
+    await page.close();
+  });
+});
+
+describe('the uploaded vision board', () => {
+  test('loads in one tap, and every stone arrives veiled', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await nameIdentity(page);
+    await sealWhy(page);
+    await page.click('[data-testid=nav-vision]');
+    await page.click('[data-testid=btn-seed]');
+    await page.waitForTimeout(500);
+
+    const state = await readAppState(page);
+    assert.ok(state.stones.length >= 18, `expected the whole board, got ${state.stones.length}`);
+    for (const s of state.stones) {
+      assert.equal(s.woopComplete, false, `${s.title} was seeded already kindled`);
+    }
+    assert.ok(state.chronicle.some((c) => c.kind === 'board'));
+    assertNoErrors(page, assert, 'after seeding');
+    await page.close();
+  });
+
+  test('loading twice does not duplicate the board', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-vision]');
+    await page.click('[data-testid=btn-seed]');
+    await page.waitForTimeout(400);
+    const first = (await readAppState(page)).stones.length;
+    await page.evaluate(() => globalThis.__ACHIEVE.state.stones.length);
+    // The seed button hides once stones exist; call the action directly.
+    await page.evaluate(() => {
+      const b = document.createElement('button');
+      b.dataset.act = 'seed-board';
+      document.body.appendChild(b);
+      b.click();
+    });
+    await page.waitForTimeout(400);
+    assert.equal((await readAppState(page)).stones.length, first, 'seeding must be idempotent');
+    await page.close();
+  });
+});
+
+describe('territories are visual and tappable', () => {
+  test('all six render as art cards', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-map]');
+    await page.waitForSelector('[data-testid=terr-grid]');
+    const count = await page.locator('.terr').count();
+    assert.equal(count, 6);
+    for (const k of ['faith', 'family', 'enterprise', 'body', 'global', 'brotherhood']) {
+      assert.equal(await page.locator(`[data-testid=terr-${k}]`).count(), 1, `${k} card missing`);
+    }
+    await page.close();
+  });
+
+  test('each card actually paints its artwork', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-map]');
+    await page.waitForSelector('.terr-art');
+    const withArt = await page.evaluate(() =>
+      [...document.querySelectorAll('.terr-art')]
+        .filter((el) => /url\("data:image/.test(getComputedStyle(el).backgroundImage)).length);
+    assert.equal(withArt, 6, 'every territory should carry an embedded image');
+    await page.close();
+  });
+
+  test('tapping a territory opens it with its full verse', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-map]');
+    await page.click('[data-testid=terr-family]');
+    await page.waitForSelector('.modal');
+    const txt = await page.textContent('.modal');
+    assert.match(txt, /Family & Legacy/);
+    assert.match(txt, /as for me and my house, we will serve the LORD/, 'the verse must appear in full');
+    assert.match(txt, /Joshua 24:15/);
+    await page.close();
+  });
+
+  test('a territory shows the stones inside it', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-vision]');
+    await page.click('[data-testid=btn-seed]');
+    await page.waitForTimeout(400);
+    await page.click('[data-testid=nav-map]');
+    await page.click('[data-testid=terr-enterprise]');
+    await page.waitForSelector('.modal');
+    const txt = await page.textContent('.modal');
+    assert.match(txt, /robotics company/i);
+    assert.match(txt, /eVTOL/i);
+    assert.match(txt, /veiled/i);
+    await page.close();
+  });
+});
+
+describe('the interface leads with action, not prose', () => {
+  test('the mechanism note is collapsed until asked for', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-today]');
+    const open = await page.evaluate(() =>
+      [...document.querySelectorAll('details.why-fold')].filter((d) => d.open).length);
+    assert.equal(open, 0, 'the study should not be shouting on the daily screen');
+    const folds = await page.locator('details.why-fold').count();
+    assert.ok(folds >= 1, 'but it must still be one tap away');
+    await page.close();
+  });
+
+  test('opening the fold reveals the citation', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-today]');
+    await page.locator('details.why-fold > summary').first().click();
+    await page.waitForTimeout(150);
+    const txt = await page.textContent('details.why-fold');
+    assert.match(txt, /\(\d{4}\)/, 'the study and its year should appear when expanded');
+    await page.close();
+  });
+
+  test('scripture stays visible; only the app’s own note folds away', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.click('[data-testid=nav-today]');
+    const verse = await page.textContent('.verse');
+    assert.ok(verse.length > 40, 'the verse itself must not be hidden behind a tap');
+    const noteOpen = await page.evaluate(() =>
+      [...document.querySelectorAll('details.note-toggle')].filter((d) => d.open).length);
+    assert.equal(noteOpen, 0);
     await page.close();
   });
 });

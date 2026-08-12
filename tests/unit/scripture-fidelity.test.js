@@ -197,9 +197,10 @@ describe('ONE SOURCE OF TRUTH for verse text', () => {
   });
 });
 
-describe('the four territories', () => {
-  test('are exactly the domains on this vision board', () => {
-    assert.deepEqual(DOMAINS.map((d) => d.name), ['Business', 'Health', 'Family', 'Spiritual Growth']);
+describe('the territories', () => {
+  test('are exactly the pillars on this vision board', () => {
+    assert.deepEqual(DOMAINS.map((d) => d.name),
+      ['Faith', 'Family & Legacy', 'Enterprise', 'Body', 'Global', 'Brotherhood']);
   });
 
   test('each carries a verse that resolves, in full, in the bank', () => {
@@ -210,13 +211,17 @@ describe('the four territories', () => {
     }
   });
 
-  test('saves from the earlier six-territory layout still open', () => {
-    assert.equal(normalizeDomain('body'), 'health');
-    assert.equal(normalizeDomain('provision'), 'business');
+  test('saves from every earlier territory layout still open', () => {
+    // The original six.
+    assert.equal(normalizeDomain('provision'), 'enterprise');
     assert.equal(normalizeDomain('household'), 'family');
-    assert.equal(normalizeDomain('communion'), 'spirit');
-    assert.equal(normalizeDomain('craft'), 'business');
-    assert.equal(normalizeDomain('assignment'), 'business');
+    assert.equal(normalizeDomain('communion'), 'faith');
+    assert.equal(normalizeDomain('craft'), 'enterprise');
+    assert.equal(normalizeDomain('assignment'), 'enterprise');
+    // The interim four.
+    assert.equal(normalizeDomain('health'), 'body');
+    assert.equal(normalizeDomain('business'), 'enterprise');
+    assert.equal(normalizeDomain('spirit'), 'faith');
   });
 
   test('an unknown domain resolves rather than crashing', () => {

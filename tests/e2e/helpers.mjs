@@ -79,6 +79,13 @@ export async function sealWhy(page, text = 'Because my father died young and I r
 }
 
 /** Create a stone by description and pass the WOOP gate. */
+/** Load the uploaded vision board as Stones. */
+export async function seedBoard(page) {
+  await page.click('[data-testid=nav-vision]');
+  await page.click('[data-testid=btn-seed]');
+  await page.waitForTimeout(400);
+}
+
 export async function makeStone(page, {
   title = 'Run the half marathon',
   outcome = 'I cross the line strong and my kids are watching from the rail',

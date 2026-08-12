@@ -273,17 +273,12 @@ describe('every view renders without throwing', () => {
     await page.close();
   });
 
-  test('both maps draw to canvas', async () => {
+  test('both maps render', async () => {
     const page = await newPage();
     await onboard(page);
     await page.click('[data-testid=nav-map]');
-    await page.waitForSelector('#land-canvas');
-    const landPainted = await page.evaluate(() => {
-      const c = document.getElementById('land-canvas');
-      const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
-      return d.some((v, i) => i % 4 !== 3 && v > 0);
-    });
-    assert.ok(landPainted, 'the Promised Land map must actually paint');
+    await page.waitForSelector('[data-testid=terr-grid]');
+    assert.equal(await page.locator('.terr').count(), 6, 'every territory must appear');
 
     await page.click('[data-testid=tab-earth]');
     await page.waitForSelector('#earth-canvas');
