@@ -1119,15 +1119,46 @@ const actions = {
     persist(); render();
   },
 
-  export() {
+  /**
+   * Export a portable save.
+   *
+   * Two paths, because the app runs in two kinds of place. Hosted or opened
+   * from disk, an <a download> works. Inside the claude.ai artifact viewer it
+   * does NOT — the sandbox never grants the page download permission, so the
+   * link silently does nothing. There the save has to go through
+   * window.claude.downloads, which asks the viewer first and can be declined.
+   */
+  async export() {
     const include = document.getElementById('export-vault')?.checked || false;
-    const blob = new Blob([exportSave(App.state, App.vault, { includeVault: include })], { type: 'application/json' });
+    const json = exportSave(App.state, App.vault, { includeVault: include });
+    const filename = `achieve-${dayKey()}.json`;
+    const ok = include ? 'Exported, including your Why.' : 'Exported. Your Why was left out.';
+
+    const dl = globalThis.claude?.downloads;
+    if (dl) {
+      try {
+        await dl.save({ filename, data: json });
+        toast(ok, 'gold');
+      } catch (err) {
+        const code = err?.code || 'unavailable';
+        toast(
+          code === 'declined' ? 'Export cancelled.'
+            : code === 'rate_limited' ? 'One save at a time — try again in a moment.'
+            : code === 'too_large' ? 'This save is too large to download here. Remove a board image first.'
+            : 'Saving is not available in this view. Open the hosted version to export.',
+          code === 'declined' ? '' : 'bad',
+        );
+      }
+      return;
+    }
+
+    const blob = new Blob([json], { type: 'application/json' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `achieve-${dayKey()}.json`;
+    a.download = filename;
     a.click();
     URL.revokeObjectURL(a.href);
-    toast(include ? 'Exported, including your Why.' : 'Exported. Your Why was left out.', 'gold');
+    toast(ok, 'gold');
   },
 
   'import-file'(el) {

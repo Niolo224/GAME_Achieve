@@ -546,3 +546,67 @@ describe('the interface leads with action, not prose', () => {
     await page.close();
   });
 });
+
+describe('exporting works where the app actually runs', () => {
+  test('uses the viewer save API when one is present, and reports a decline', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.evaluate(() => {
+      globalThis.__saveCalls = [];
+      globalThis.claude = {
+        downloads: {
+          save: (req) => { globalThis.__saveCalls.push(req); return Promise.reject({ code: 'declined', message: 'no' }); },
+        },
+      };
+    });
+    await page.click('[data-testid=nav-settings]');
+    await page.click('[data-testid=btn-export]');
+    await page.waitForTimeout(400);
+
+    const calls = await page.evaluate(() => globalThis.__saveCalls);
+    assert.equal(calls.length, 1, 'must route through the viewer save API');
+    assert.match(calls[0].filename, /^achieve-\d{4}-\d{2}-\d{2}\.json$/);
+    assert.ok(calls[0].data.includes('achieve.save'));
+
+    const toast = await page.textContent('.toast-wrap');
+    assert.match(toast, /cancelled/i, 'a declined save must say so, not claim success');
+    await page.close();
+  });
+
+  test('a declined export still leaves the private Why out of the payload', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await nameIdentity(page);
+    await sealWhy(page, 'the sealed private reason');
+    await page.evaluate(() => {
+      globalThis.__saveCalls = [];
+      globalThis.claude = { downloads: { save: (r) => { globalThis.__saveCalls.push(r); return Promise.resolve({ status: 'saved' }); } } };
+    });
+    await page.click('[data-testid=nav-settings]');
+    await page.click('[data-testid=btn-export]');
+    await page.waitForTimeout(400);
+    const data = (await page.evaluate(() => globalThis.__saveCalls))[0].data;
+    assert.ok(!data.includes('sealed private reason'), 'THE WHY MUST NOT RIDE ALONG');
+    await page.close();
+  });
+
+  test('falls back to a link when there is no viewer API', async () => {
+    const page = await newPage();
+    await onboard(page);
+    await page.evaluate(() => {
+      globalThis.__clicked = null;
+      const orig = document.createElement.bind(document);
+      document.createElement = (t) => {
+        const el = orig(t);
+        if (t === 'a') el.click = () => { globalThis.__clicked = el.download; };
+        return el;
+      };
+    });
+    await page.click('[data-testid=nav-settings]');
+    await page.click('[data-testid=btn-export]');
+    await page.waitForTimeout(400);
+    const name = await page.evaluate(() => globalThis.__clicked);
+    assert.match(name || '', /^achieve-\d{4}-\d{2}-\d{2}\.json$/);
+    await page.close();
+  });
+});
