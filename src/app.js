@@ -8,7 +8,7 @@
 import { esc, dayKey, uid, clamp, pct, hashStr, daysBetween, addDays } from './core/util.js';
 import {
   emptyState, emptyVault, migrate, shareable, summarize, DOMAINS, domain, normalizeDomain,
-  addIdentity, addStone, addQuest, castVote, addPing, chronicle, setWhy, getWhy,
+  addIdentity, addStone, addQuest, castVote, addPing, chronicle, setWhy, getWhy, addDeed,
 } from './core/state.js';
 import {
   loadState, saveState, loadVault, saveVault, destroyVault,
@@ -25,6 +25,8 @@ import { runGrowth, buildSeries, explainRate, displayTerms } from './core/growth
 import { verseFor, verseByRef } from './data/scripture.js';
 import { SEED_STONES, SEED_IDENTITIES, BOARD_TITLE, DECLARATION } from './data/board.js';
 import { artFor } from './data/art.js';
+import { readCharacter, deedSize, levelUpLine, DEED_SIZES } from './core/character.js';
+import { animateAvatar } from './ui/avatar.js';
 import { principle } from './data/neuro.js';
 import * as V from './ui/views.js';
 
@@ -48,6 +50,7 @@ const App = {
   pendingQuest: null,
   whyGate: null,
   whyGateTimer: null,
+  avatarStop: null,
 };
 
 globalThis.__ACHIEVE = App; // test hook
@@ -132,8 +135,10 @@ function context() {
     };
   }
 
+  const character = readCharacter(state, read, DOMAINS);
+
   return {
-    state, read, step, word, tallies, growth, explain, territories,
+    state, read, step, word, tallies, growth, explain, territories, character,
     mapTab: App.mapTab,
     picking: App.picking,
     syncStatus: App.syncStatus,
@@ -212,6 +217,13 @@ function render() {
     ${toastHtml()}
   `;
 
+  // The figure breathes while its view is on screen.
+  if (App.avatarStop) { App.avatarStop(); App.avatarStop = null; }
+  const avatarEl = document.getElementById('avatar-canvas');
+  if (avatarEl) {
+    App.avatarStop = animateAvatar(avatarEl, () => context().character, DOMAINS);
+  }
+
   // Canvas passes have to happen after the DOM exists.
   if (App.view === 'map' && App.mapTab === 'land') drawLand(ctx);
   if (App.view === 'map' && App.mapTab === 'earth') drawEarth(ctx);
@@ -279,8 +291,8 @@ function drawLand(ctx) {
 
   // ground
   const grd = g.createLinearGradient(0, 0, 0, H);
-  grd.addColorStop(0, '#0a0c13');
-  grd.addColorStop(1, '#0e1119');
+  grd.addColorStop(0, '#F7F4FE');
+  grd.addColorStop(1, '#EDE9FB');
   g.fillStyle = grd;
   g.fillRect(0, 0, W, H);
 
@@ -305,10 +317,10 @@ function drawLand(ctx) {
     g.beginPath();
     hexPath(g, cx, cy, R);
     g.fillStyle = t.total === 0
-      ? 'rgba(30,34,48,.5)'
-      : `hsla(${d.hue}, ${18 + kindled * 30}%, ${8 + frac * 22}%, ${.55 + frac * .45})`;
+      ? 'rgba(226,219,246,.55)'
+      : `hsla(${d.hue}, ${28 + kindled * 38}%, ${93 - frac * 16}%, ${.7 + frac * .3})`;
     g.fill();
-    g.strokeStyle = t.total === 0 ? '#232838' : `hsla(${d.hue}, 45%, ${28 + frac * 32}%, .9)`;
+    g.strokeStyle = t.total === 0 ? '#D8D0F0' : `hsla(${d.hue}, 58%, ${72 - frac * 16}%, .95)`;
     g.lineWidth = 2;
     g.stroke();
 
@@ -316,19 +328,19 @@ function drawLand(ctx) {
     if (frac > 0) {
       g.beginPath();
       hexPath(g, cx, cy, R * (0.28 + frac * 0.62));
-      g.fillStyle = `hsla(${d.hue}, 62%, 52%, .30)`;
+      g.fillStyle = `hsla(${d.hue}, 68%, 66%, .34)`;
       g.fill();
-      g.strokeStyle = `hsla(${d.hue}, 70%, 62%, .8)`;
+      g.strokeStyle = `hsla(${d.hue}, 62%, 58%, .85)`;
       g.lineWidth = 1.5;
       g.stroke();
     }
 
-    g.fillStyle = t.total === 0 ? '#5a5d70' : '#e8e6e0';
+    g.fillStyle = t.total === 0 ? '#9A93B9' : '#34305A';
     g.font = `600 ${fs}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.fillText(d.name, cx, cy - 2);
 
-    g.fillStyle = t.total === 0 ? '#43465a' : `hsl(${d.hue}, 55%, 68%)`;
+    g.fillStyle = t.total === 0 ? '#ADA6C8' : `hsl(${d.hue}, 46%, 44%)`;
     g.font = `${fs * 0.82}px ui-sans-serif, system-ui, sans-serif`;
     g.fillText(t.total ? `${t.done}/${t.total} taken` : 'unclaimed', cx, cy + fs + 2);
   });
@@ -336,7 +348,7 @@ function drawLand(ctx) {
   // The app's own caption. Joshua 1:3 is printed in full, with its reference
   // and context, in the panel above — a canvas label cannot do that, and
   // trimming a verse to fit a width is not something this app does.
-  g.fillStyle = '#6f7284';
+  g.fillStyle = '#9A93B9';
   g.font = `${clamp(W / 62, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
   g.fillText('Ground is taken by treading it. Set a Stone in a territory to begin.', W / 2, H - 8);
@@ -358,12 +370,12 @@ function drawEarth(ctx) {
   const cv = document.getElementById('earth-canvas');
   if (!cv) return;
   const { g, W, H } = fitCanvas(cv, 900 / 560);
-  g.fillStyle = '#080a10';
+  g.fillStyle = '#EAF2FB';
   g.fillRect(0, 0, W, H);
 
   const pings = ctx.state.pings;
   if (!pings.length) {
-    g.fillStyle = '#4a4d60';
+    g.fillStyle = '#9A93B9';
     g.font = `${clamp(W / 32, 12, 15)}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.fillText('No ground marked yet.', W / 2, H / 2 - 8);
@@ -392,7 +404,7 @@ function drawEarth(ctx) {
 
   // distance rings
   const kmPerDeg = 111.32;
-  g.strokeStyle = '#1a1e2b';
+  g.strokeStyle = '#D3E2F2';
   g.lineWidth = 1;
   for (const km of [0.5, 1, 2, 5, 10, 25]) {
     const r = (km / kmPerDeg) * scale;
@@ -400,26 +412,26 @@ function drawEarth(ctx) {
     g.beginPath();
     g.arc(W / 2, H / 2, r, 0, Math.PI * 2);
     g.stroke();
-    g.fillStyle = '#2c3244';
+    g.fillStyle = '#A9BDD2';
     g.font = '10px ui-monospace, monospace';
     g.textAlign = 'left';
     g.fillText(`${km}km`, W / 2 + r + 4, H / 2 - 3);
   }
 
   // crosshair
-  g.strokeStyle = '#161a26';
+  g.strokeStyle = '#DCE8F5';
   g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2);
   g.moveTo(W / 2, 0); g.lineTo(W / 2, H); g.stroke();
 
   // compass
-  g.fillStyle = '#3a3e52';
+  g.fillStyle = '#8FA6BE';
   g.font = '600 12px ui-sans-serif, sans-serif';
   g.textAlign = 'center';
   g.fillText('N', W / 2, 16);
 
   // trail between pings, oldest to newest
   const ordered = pings.slice().sort((a, b) => a.ts - b.ts);
-  g.strokeStyle = 'rgba(224,176,84,.22)';
+  g.strokeStyle = 'rgba(224,146,31,.45)';
   g.lineWidth = 1.5;
   g.setLineDash([4, 5]);
   g.beginPath();
@@ -433,23 +445,23 @@ function drawEarth(ctx) {
   ordered.forEach((p, i) => {
     const { x, y } = proj(p);
     const isLast = i === ordered.length - 1;
-    const color = p.kind === 'quest' ? '#5b8fb0' : '#e0b054';
+    const color = p.kind === 'quest' ? '#57ABE6' : '#F5AE3C';
 
     if (isLast) {
       g.beginPath();
       g.arc(x, y, 15, 0, Math.PI * 2);
-      g.fillStyle = 'rgba(224,176,84,.14)';
+      g.fillStyle = 'rgba(245,174,60,.24)';
       g.fill();
     }
     g.beginPath();
     g.arc(x, y, 6, 0, Math.PI * 2);
     g.fillStyle = color;
     g.fill();
-    g.strokeStyle = '#080a10';
+    g.strokeStyle = '#FFFFFF';
     g.lineWidth = 2;
     g.stroke();
 
-    g.fillStyle = '#c9cbd6';
+    g.fillStyle = '#4A5B6E';
     g.font = `${clamp(W / 40, 10, 13)}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     const label = p.label || 'Ebenezer';
@@ -457,7 +469,7 @@ function drawEarth(ctx) {
   });
 
   // As above: 1 Samuel 7:12 is printed in full above the map.
-  g.fillStyle = '#6f7284';
+  g.fillStyle = '#8FA6BE';
   g.font = `${clamp(W / 60, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
   g.fillText('Each marker is ground you actually stood on.', W / 2, H - 8);
@@ -470,7 +482,7 @@ function drawGrowth(ctx) {
   if (!cv) return;
   const { g, W, H } = fitCanvas(cv, 900 / 420);
   g.clearRect(0, 0, W, H);
-  g.fillStyle = '#0a0c13';
+  g.fillStyle = '#FBF9FF';
   g.fillRect(0, 0, W, H);
 
   const pts = ctx.growth.points;
@@ -480,7 +492,7 @@ function drawGrowth(ctx) {
   const ih = H - pad.t - pad.b;
 
   if (pts.length < 2) {
-    g.fillStyle = '#4a4d60';
+    g.fillStyle = '#9A93B9';
     g.font = `${clamp(W / 32, 12, 15)}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.fillText('Two days of steps and the lines appear.', W / 2, H / 2);
@@ -492,9 +504,9 @@ function drawGrowth(ctx) {
   const Y = (v) => pad.t + ih - (v / maxY) * ih;
 
   // grid
-  g.strokeStyle = '#171b26';
+  g.strokeStyle = '#E7E1F7';
   g.lineWidth = 1;
-  g.fillStyle = '#4a4d60';
+  g.fillStyle = '#9A93B9';
   g.font = `${fs}px ui-monospace, monospace`;
   g.textAlign = 'right';
   for (let i = 0; i <= 4; i++) {
@@ -510,32 +522,32 @@ function drawGrowth(ctx) {
   for (let i = pts.length - 1; i >= 0; i--) g.lineTo(X(i), Y(pts[i].linear));
   g.closePath();
   const fill = g.createLinearGradient(0, pad.t, 0, H);
-  fill.addColorStop(0, 'rgba(224,176,84,.22)');
-  fill.addColorStop(1, 'rgba(224,176,84,.02)');
+  fill.addColorStop(0, 'rgba(245,174,60,.32)');
+  fill.addColorStop(1, 'rgba(245,174,60,.04)');
   g.fillStyle = fill;
   g.fill();
 
   // linear
   g.beginPath();
   pts.forEach((p, i) => { const x = X(i); i === 0 ? g.moveTo(x, Y(p.linear)) : g.lineTo(x, Y(p.linear)); });
-  g.strokeStyle = '#8b8f9e';
-  g.lineWidth = 2;
+  g.strokeStyle = '#A9A2C6';
+  g.lineWidth = 2.5;
   g.stroke();
 
   // increase
   g.beginPath();
   pts.forEach((p, i) => { const x = X(i); i === 0 ? g.moveTo(x, Y(p.increase)) : g.lineTo(x, Y(p.increase)); });
-  g.strokeStyle = '#e0b054';
-  g.lineWidth = 2.5;
+  g.strokeStyle = '#E0921F';
+  g.lineWidth = 3;
   g.stroke();
 
   // endpoint
   const last = pts[pts.length - 1];
   g.beginPath();
   g.arc(X(pts.length - 1), Y(last.increase), 4.5, 0, Math.PI * 2);
-  g.fillStyle = '#e0b054'; g.fill();
+  g.fillStyle = '#E0921F'; g.fill();
 
-  g.fillStyle = '#4a4d60';
+  g.fillStyle = '#9A93B9';
   g.font = `${fs}px ui-monospace, monospace`;
   g.textAlign = 'left';
   g.fillText(pts[0].day, pad.l, H - fs * 0.6);
@@ -543,7 +555,7 @@ function drawGrowth(ctx) {
   g.fillText(last.day, W - pad.r, H - fs * 0.6);
 
   if (Math.abs(last.increase - last.linear) < 0.01) {
-    g.fillStyle = '#8b8f9e';
+    g.fillStyle = '#7C74A4';
     g.font = `italic ${clamp(W / 40, 10, 13)}px Georgia, serif`;
     g.textAlign = 'center';
     g.fillText('One line. Consistency is what separates them.', W / 2, pad.t + 14);
@@ -906,6 +918,60 @@ const actions = {
     if (App.focusTimer) clearInterval(App.focusTimer);
     App.focus = null; App.focusTimer = null;
     closeModal();
+  },
+
+  // ── logging what actually happened ──
+  'new-deed'(el) { openModal(V.deedModal(context(), el?.dataset?.domain || null)); },
+
+  'pick-size'(el) {
+    document.getElementById('d-size').value = el.dataset.size;
+    for (const c of document.querySelectorAll('.size-chip')) c.classList.remove('on');
+    el.classList.add('on');
+  },
+
+  'deed-save'() {
+    const text = (document.getElementById('d-text')?.value || '').trim();
+    const box = document.getElementById('deed-errors');
+    if (text.length < 3) {
+      box.innerHTML = `<div class="err">Say what you did, even briefly.</div>`;
+      return;
+    }
+    const dom = document.getElementById('d-domain')?.value || DOMAINS[0].key;
+    const sizeKey = document.getElementById('d-size')?.value || 'small';
+    const identityId = document.getElementById('d-identity')?.value || null;
+    const size = deedSize(sizeKey);
+
+    const before = readCharacter(App.state, readState(App.state), DOMAINS);
+    const deed = addDeed(App.state, { text, domain: dom, identityId, size: size.key, xp: size.xp });
+    if (identityId) castVote(App.state, { identityId, questId: null, isFor: true });
+
+    const after = readCharacter(App.state, readState(App.state), DOMAINS);
+    const levelled = after.level > before.level;
+    const staged = after.stage.key !== before.stage.key;
+
+    chronicle(App.state, {
+      kind: 'deed',
+      title: text,
+      body: `Logged in ${domain(dom).name}. +${size.xp} XP.`
+        + (staged ? ` You reached ${after.stage.name}, level ${after.level}.` : levelled ? ` Level ${after.level}.` : ''),
+      refs: [{ ref: 'Hebrews 11:1', why: 'Hebrews describes faith as the evidence of what is not yet seen.' }],
+      meta: { deedId: deed.id, domain: dom, xp: size.xp },
+    });
+    persist();
+    closeModal();
+
+    if (levelled) {
+      // A new STAGE is a different announcement from a new level inside one.
+      openModal(`
+        <div class="manna">
+          <div class="eyebrow" style="color:var(--gold)">${staged ? 'New stage' : `Level ${after.level}`}</div>
+          <div class="m-title">${esc(staged ? after.stage.name : `Level ${after.level}`)}</div>
+          <p class="small mut">${esc(staged ? after.stage.line : levelUpLine(after))}</p>
+          <button class="btn primary" data-act="close-modal">Go on</button>
+        </div>`);
+    } else {
+      toast(`+${size.xp} XP · ${domain(dom).name} is tended`, 'gold');
+    }
   },
 
   // ── map ──

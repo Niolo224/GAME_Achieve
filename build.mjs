@@ -32,6 +32,8 @@ const MODULES = [
   'core/growth.js',
   'core/storage.js',
   'core/guide.js',
+  'core/character.js',
+  'ui/avatar.js',
   'ui/views.js',
   'app.js',
 ];

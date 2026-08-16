@@ -124,6 +124,7 @@ export function emptyState() {
     manna: [],
     chronicle: [],
     letters: [],
+    deeds: [],
     circle: { code: null, joinedAt: null, members: [], messages: [] },
     settings: {
       sabbathEnabled: true,
@@ -212,7 +213,7 @@ export function migrate(raw) {
     circle: { ...base.circle, ...(raw.circle || {}) },
   };
   // Arrays must be arrays even if a save was truncated or hand-edited.
-  for (const k of ['identities', 'boards', 'stones', 'quests', 'votes', 'pings', 'focusBlocks', 'manna', 'chronicle', 'letters']) {
+  for (const k of ['identities', 'boards', 'stones', 'quests', 'votes', 'pings', 'focusBlocks', 'manna', 'chronicle', 'letters', 'deeds']) {
     if (!Array.isArray(out[k])) out[k] = [];
   }
   // Remap territories from the earlier six-domain layout.
@@ -313,6 +314,21 @@ export function addPing(state, { kind, lat, lng, label, note, questId }) {
  * driver of inner work life, and NOTICING it is part of the effect.
  * Nothing in this game completes silently.
  */
+export function addDeed(state, { text, domain: dom, identityId, size, xp }) {
+  const deed = {
+    id: uid('ded'),
+    text: String(text || '').trim(),
+    domain: normalizeDomain(dom),
+    identityId: identityId || null,
+    size: size || 'small',
+    xp: xp || 10,
+    day: dayKey(),
+    ts: Date.now(),
+  };
+  state.deeds.unshift(deed);
+  return deed;
+}
+
 export function chronicle(state, { kind, title, body, refs, meta }) {
   const entry = {
     id: uid('chr'),

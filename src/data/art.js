@@ -110,25 +110,30 @@ export function artFor(key, hue = 42) {
   g.imageSmoothingQuality = 'high';
   g.drawImage(small, 0, 0, W, H);
 
-  // 3. A wash in the territory's hue, so the set reads as one system.
-  g.globalCompositeOperation = 'overlay';
-  g.fillStyle = `hsla(${hue}, 60%, 45%, .28)`;
+  // 3. Lift the sample out of the dark. The renders were shot at night; the
+  //    interface they live in now is daylight. Screening a mid grey raises
+  //    the blacks without flattening the highlights.
+  g.globalCompositeOperation = 'screen';
+  g.fillStyle = 'rgb(142, 138, 176)';
   g.fillRect(0, 0, W, H);
 
-  // 4. Deepen the base so light text always holds.
-  g.globalCompositeOperation = 'multiply';
-  const deep = g.createLinearGradient(0, 0, 0, H);
-  deep.addColorStop(0, 'rgba(255,255,255,1)');
-  deep.addColorStop(1, 'rgba(120,120,140,1)');
-  g.fillStyle = deep;
+  // 4. Hand it the territory's hue outright, keeping the render's luminance.
+  //    A translucent wash could not survive step 3 — it came out grey — so
+  //    the hue is applied as a blend rather than as a tint.
+  g.globalCompositeOperation = 'color';
+  g.fillStyle = `hsl(${hue}, 74%, 56%)`;
   g.fillRect(0, 0, W, H);
 
-  // 5. Vignette.
+  // 5. Toward pastel, and a haze at the foot where the title sits.
   g.globalCompositeOperation = 'source-over';
-  const vig = g.createRadialGradient(W / 2, H * 0.42, H * 0.15, W / 2, H / 2, H * 0.95);
-  vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(1, 'rgba(4,5,9,.62)');
-  g.fillStyle = vig;
+  g.fillStyle = 'rgba(255,255,255,.26)';
+  g.fillRect(0, 0, W, H);
+
+  const haze = g.createLinearGradient(0, H, 0, H * 0.46);
+  haze.addColorStop(0, 'rgba(255,255,255,.90)');
+  haze.addColorStop(0.5, 'rgba(255,255,255,.42)');
+  haze.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = haze;
   g.fillRect(0, 0, W, H);
 
   const uri = c.toDataURL('image/jpeg', 0.82);

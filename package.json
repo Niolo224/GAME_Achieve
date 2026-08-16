@@ -6,9 +6,9 @@
   "description": "ACHIEVE — Write The Vision. A gamified vision board built on a Be>Do>Have identity engine, scripture (KJV) as the mainframe, and peer-reviewed behavioural neuroscience as the mechanics.",
   "scripts": {
     "build": "node build.mjs",
-    "test": "node --test tests/unit/",
-    "test:e2e": "node build.mjs && node --test tests/e2e/",
-    "test:all": "npm run build && node --test tests/unit/ && node --test tests/e2e/",
+    "test": "node --test \"tests/unit/*.test.js\"",
+    "test:e2e": "node build.mjs && node --test \"tests/e2e/*.test.js\"",
+    "test:all": "npm run build && npm test && node --test \"tests/e2e/*.test.js\"",
     "serve": "node scripts/serve.mjs"
   },
   "devDependencies": {

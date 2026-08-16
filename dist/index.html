@@ -4,44 +4,49 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0b0d14">
 <style>/* ACHIEVE — Write The Vision
-   A committed dark interface: lamplight on dark ground. Gold is manna, fire,
-   and the lamp; deep ink is the ground you have not taken yet. */
+   A soft, warm, daylight interface. Everything is rounded, nothing is sharp,
+   and the page is a pale lavender sky with white cards resting on it.
+   Colour carries meaning rather than decoration: amber is the lamp and the
+   manna, and each territory keeps its own pastel hue throughout. */
 
 :root {
-  --ink: #0b0d14;
-  --ink-2: #12151f;
-  --ink-3: #1a1e2b;
-  --ink-4: #232838;
-  --line: #2c3244;
-  --line-soft: #232838;
+  --ink: #F3F0FC;      /* the page itself */
+  --ink-2: #FFFFFF;    /* a card resting on it */
+  --ink-3: #F6F3FE;    /* an inset well */
+  --ink-4: #EAE4FA;    /* a raised chip */
+  --line: #E2DBF6;
+  --line-soft: #EEEAFB;
 
-  --text: #e8e6e0;
-  --text-2: #a8a99c;
-  --text-3: #6f7284;
+  --text: #34305A;
+  --text-2: #6B6592;
+  --text-3: #9A93B9;
 
-  --gold: #e0b054;
-  --gold-2: #c9973c;
-  --gold-dim: #6b5527;
-  --flame: #e2703a;
-  --olive: #7d9a6a;
-  --water: #5b8fb0;
-  --blood: #a8484a;
-  --violet: #8a76b8;
+  --gold: #F5AE3C;
+  --gold-2: #E0921F;
+  --gold-dim: #FBE3B8;
+  --flame: #FF8A65;
+  --olive: #4FC397;
+  --water: #57ABE6;
+  --blood: #EE7A85;
+  --violet: #8B7BE8;
 
-  --ok: #7d9a6a;
-  --warn: #d19a44;
-  --bad: #b3565a;
+  --ok: #4FC397;
+  --warn: #F5AE3C;
+  --bad: #EE7A85;
 
-  --radius: 12px;
-  --radius-sm: 8px;
-  --radius-lg: 18px;
+  /* Rounded to the point of softness — the Finch rule: no hard corners. */
+  --radius: 22px;
+  --radius-sm: 14px;
+  --radius-lg: 30px;
 
   --serif: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Book Antiqua', Georgia, serif;
-  --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --sans: ui-rounded, 'SF Pro Rounded', 'Nunito', 'Quicksand', ui-sans-serif, system-ui,
+          -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   --mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
 
-  --shadow: 0 10px 40px rgba(0, 0, 0, .5);
-  --glow: 0 0 24px rgba(224, 176, 84, .18);
+  --shadow: 0 10px 30px rgba(88, 68, 168, .13);
+  --shadow-sm: 0 3px 12px rgba(88, 68, 168, .08);
+  --glow: 0 8px 22px rgba(245, 174, 60, .28);
 }
 
 * { box-sizing: border-box; }
@@ -60,8 +65,9 @@ html, body {
 
 body {
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(224, 176, 84, .07), transparent 70%),
-    radial-gradient(ellipse 60% 40% at 90% 100%, rgba(138, 118, 184, .05), transparent 70%);
+    radial-gradient(ellipse 90% 55% at 50% -8%, rgba(255, 213, 150, .40), transparent 70%),
+    radial-gradient(ellipse 70% 45% at 88% 102%, rgba(139, 123, 232, .16), transparent 72%),
+    radial-gradient(ellipse 60% 40% at 6% 88%, rgba(79, 195, 151, .12), transparent 70%);
   background-attachment: fixed;
   min-height: 100vh;
 }
@@ -132,7 +138,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 60;
   display: flex; justify-content: center; gap: 2px;
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px));
-  background: rgba(11, 13, 20, .93);
+  background: rgba(255, 255, 255, .92);
   backdrop-filter: blur(14px);
   border-top: 1px solid var(--line-soft);
   overflow-x: auto;
@@ -149,9 +155,9 @@ button, input, textarea, select { font: inherit; color: inherit; }
   font-size: .66rem; letter-spacing: .03em;
   transition: color .15s, background .15s;
 }
-.nav button .ico { font-size: 1.06rem; line-height: 1; filter: grayscale(1) opacity(.65); transition: filter .15s; }
+.nav button .ico { font-size: 1.12rem; line-height: 1; filter: grayscale(.7) opacity(.7); transition: filter .15s; }
 .nav button:hover { color: var(--text-2); background: var(--ink-2); }
-.nav button[aria-current='true'] { color: var(--gold); background: var(--ink-3); }
+.nav button[aria-current='true'] { color: var(--gold-2); background: #FFF3DC; }
 .nav button[aria-current='true'] .ico { filter: none; }
 .nav button .dot {
   position: absolute; margin-left: 30px; margin-top: -2px;
@@ -164,8 +170,9 @@ button, input, textarea, select { font: inherit; color: inherit; }
   background: var(--ink-2);
   border: 1px solid var(--line-soft);
   border-radius: var(--radius);
-  padding: 16px;
+  padding: 18px;
   margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
 }
 .card.tight { padding: 12px 14px; }
 .card.raised { box-shadow: var(--shadow); }
@@ -189,27 +196,27 @@ button, input, textarea, select { font: inherit; color: inherit; }
   border-radius: var(--radius-lg);
   padding: 22px;
   background:
-    linear-gradient(160deg, rgba(224, 176, 84, .10), transparent 55%),
+    linear-gradient(160deg, rgba(245, 174, 60, .16), transparent 55%),
     var(--ink-2);
   box-shadow: var(--glow);
   overflow: hidden;
 }
 .step::before {
   content: ''; position: absolute; inset: 0;
-  background: radial-gradient(ellipse 60% 80% at 8% 0%, rgba(224, 176, 84, .13), transparent 60%);
+  background: radial-gradient(ellipse 60% 80% at 8% 0%, rgba(245, 174, 60, .18), transparent 60%);
   pointer-events: none;
 }
-.step.tone-rest { border-color: #2f4257; background: linear-gradient(160deg, rgba(91, 143, 176, .10), transparent 55%), var(--ink-2); box-shadow: none; }
-.step.tone-mercy { border-color: #4a3a5e; background: linear-gradient(160deg, rgba(138, 118, 184, .12), transparent 55%), var(--ink-2); box-shadow: none; }
-.step.tone-gate { border-color: #5c4030; background: linear-gradient(160deg, rgba(226, 112, 58, .10), transparent 55%), var(--ink-2); box-shadow: none; }
-.step.tone-nearing { border-color: var(--gold); box-shadow: 0 0 34px rgba(224, 176, 84, .26); }
+.step.tone-rest { border-color: #BFDCF4; background: linear-gradient(160deg, rgba(87, 171, 230, .13), transparent 55%), var(--ink-2); box-shadow: none; }
+.step.tone-mercy { border-color: #D6CEF7; background: linear-gradient(160deg, rgba(139, 123, 232, .14), transparent 55%), var(--ink-2); box-shadow: none; }
+.step.tone-gate { border-color: #FFD3C2; background: linear-gradient(160deg, rgba(255, 138, 101, .13), transparent 55%), var(--ink-2); box-shadow: none; }
+.step.tone-nearing { border-color: var(--gold); box-shadow: 0 12px 34px rgba(245, 174, 60, .34); }
 
 .step h1 { font-family: var(--serif); font-size: 1.5rem; margin-bottom: .35em; position: relative; }
 .step .step-body { color: var(--text-2); position: relative; margin-bottom: 14px; }
 .step .step-quest {
   font-family: var(--serif); font-size: 1.12rem; color: var(--text);
   padding: 12px 14px; border-left: 3px solid var(--gold);
-  background: rgba(0, 0, 0, .22); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: #FFF7E8; border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   margin-bottom: 14px; position: relative;
 }
 
@@ -220,7 +227,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
   border-left: 2px solid var(--gold-dim);
   padding: 2px 0 2px 14px;
   margin: 12px 0;
-  color: #ddd6c4;
+  color: var(--text);
   font-size: 1.02rem;
   line-height: 1.6;
   position: relative;
@@ -242,7 +249,7 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .why {
   border: 1px solid var(--line-soft);
   border-radius: var(--radius-sm);
-  background: rgba(0, 0, 0, .2);
+  background: var(--ink-3);
   padding: 11px 13px;
   margin: 12px 0 0;
   position: relative;
@@ -266,26 +273,27 @@ button, input, textarea, select { font: inherit; color: inherit; }
   display: inline-flex; align-items: center; justify-content: center; gap: 7px;
   padding: 10px 18px;
   border: 1px solid var(--line);
-  border-radius: var(--radius-sm);
-  background: var(--ink-3);
+  border-radius: 999px;
+  background: var(--ink-2);
   color: var(--text);
   cursor: pointer;
-  font-size: .9rem; font-weight: 500;
+  font-size: .9rem; font-weight: 600;
+  box-shadow: var(--shadow-sm);
   transition: background .15s, border-color .15s, transform .06s;
   text-decoration: none;
 }
-.btn:hover { background: var(--ink-4); border-color: var(--text-3); }
+.btn:hover { background: var(--ink-4); border-color: var(--line); }
 .btn:active { transform: translateY(1px); }
 .btn:disabled { opacity: .45; cursor: not-allowed; }
 .btn.primary {
   background: linear-gradient(180deg, var(--gold), var(--gold-2));
-  border-color: var(--gold-2); color: #22190a; font-weight: 650;
+  border-color: transparent; color: #4A3208; font-weight: 700; box-shadow: var(--glow);
 }
-.btn.primary:hover { background: linear-gradient(180deg, #eec066, var(--gold)); }
+.btn.primary:hover { background: linear-gradient(180deg, #FFC163, var(--gold)); transform: translateY(-1px); }
 .btn.ghost { background: none; }
 .btn.sm { padding: 6px 12px; font-size: .8rem; }
-.btn.danger { color: var(--bad); border-color: #4a2b2d; }
-.btn.danger:hover { background: #2a1618; }
+.btn.danger { color: #C24E5B; border-color: #F8CDD2; }
+.btn.danger:hover { background: #FDECEE; }
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
 
 /* ── forms ──────────────────────────────────────────────────────────── */
@@ -312,19 +320,19 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 3px rgba(224, 176, 84, .12);
 }
 textarea { resize: vertical; min-height: 74px; line-height: 1.55; }
-input::placeholder, textarea::placeholder { color: #4e5164; }
+input::placeholder, textarea::placeholder { color: var(--text-3); }
 
 .err {
   display: block; margin-top: 6px; padding: 8px 10px;
   background: rgba(179, 86, 90, .1); border-left: 2px solid var(--bad);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: .82rem; color: #e2a9ab;
+  font-size: .82rem; color: #C24E5B;
 }
 .err .err-help { display: block; margin-top: 4px; color: var(--text-3); font-size: .76rem; font-style: italic; }
 .ok-msg {
   padding: 8px 10px; background: rgba(125, 154, 106, .1);
   border-left: 2px solid var(--ok); border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  font-size: .84rem; color: #b6cba6;
+  font-size: .84rem; color: #2E9B73;
 }
 
 /* ── grids and lists ────────────────────────────────────────────────── */
@@ -357,7 +365,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .bar { height: 6px; background: var(--ink-4); border-radius: 999px; overflow: hidden; }
 .bar > i { display: block; height: 100%; background: linear-gradient(90deg, var(--gold-2), var(--gold)); border-radius: 999px; transition: width .5s cubic-bezier(.2,.8,.2,1); }
 .bar.thin { height: 4px; }
-.bar.olive > i { background: linear-gradient(90deg, #5c7a4c, var(--olive)); }
+.bar.olive > i { background: linear-gradient(90deg, #7ADCB4, var(--olive)); }
 
 /* ── stones / vision board ──────────────────────────────────────────── */
 
@@ -367,7 +375,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .board-wrap.picking::after {
   content: 'Tap a thing on your board to set a Stone';
   position: absolute; left: 50%; top: 12px; transform: translateX(-50%);
-  background: rgba(0,0,0,.8); color: var(--gold); padding: 6px 13px;
+  background: #FFFFFF; color: var(--gold-2); padding: 6px 13px; box-shadow: var(--shadow-sm);
   border-radius: 999px; font-size: .76rem; white-space: nowrap; pointer-events: none;
   border: 1px solid var(--gold-dim);
 }
@@ -375,15 +383,15 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .pin {
   position: absolute; transform: translate(-50%, -50%);
   width: 26px; height: 26px; border-radius: 50%;
-  background: rgba(224, 176, 84, .9); border: 2px solid #22190a;
-  color: #22190a; font-size: .72rem; font-weight: 700;
+  background: var(--gold); border: 2px solid #FFFFFF;
+  color: #4A3208; font-size: .72rem; font-weight: 700;
   display: grid; place-items: center; cursor: pointer;
-  box-shadow: 0 0 0 4px rgba(224,176,84,.2), 0 2px 8px rgba(0,0,0,.6);
+  box-shadow: 0 0 0 4px rgba(245,174,60,.24), 0 3px 10px rgba(88,68,168,.22);
   transition: transform .15s;
 }
 .pin:hover { transform: translate(-50%, -50%) scale(1.18); }
-.pin.veiled { background: #4a4d5e; color: #9a9db0; box-shadow: 0 0 0 4px rgba(74,77,94,.2); }
-.pin.done { background: var(--olive); color: #14200e; }
+.pin.veiled { background: #CFC8E6; color: #6B6592; box-shadow: 0 0 0 4px rgba(139,123,232,.16); }
+.pin.done { background: var(--olive); color: #FFFFFF; }
 
 .stone {
   border: 1px solid var(--line-soft); border-radius: var(--radius);
@@ -396,7 +404,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .stone .stone-thumb { width: 100%; height: 92px; object-fit: cover; border-radius: var(--radius-sm); margin-bottom: 9px; border: 1px solid var(--line-soft); }
 .veil-badge {
   display: inline-flex; align-items: center; gap: 5px;
-  font-size: .7rem; color: var(--flame); border: 1px solid #5c4030;
+  font-size: .7rem; color: #D9612F; border: 1px solid #FFD3C2;
   padding: 2px 8px; border-radius: 999px; margin-top: 8px;
 }
 
@@ -409,7 +417,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 }
 .map-tabs button[aria-pressed='true'] { background: var(--ink-4); color: var(--gold); border-color: var(--gold-dim); }
 
-.canvas-wrap { position: relative; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #080a10; }
+.canvas-wrap { position: relative; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #EAF3FB; }
 .canvas-wrap canvas { display: block; width: 100%; height: auto; }
 .map-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; font-size: .76rem; color: var(--text-3); }
 .map-legend i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
@@ -438,7 +446,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .msg .bd { font-size: .9rem; word-wrap: break-word; overflow-wrap: anywhere; white-space: pre-wrap; }
 .msg .tm { font-size: .66rem; color: var(--text-3); margin-top: 3px; }
 .msg.mine { flex-direction: row-reverse; }
-.msg.mine .bub { background: #2b2416; border-radius: 11px 3px 11px 11px; }
+.msg.mine .bub { background: #FFF0D2; border-radius: 16px 5px 16px 16px; }
 .msg.mine .nm { text-align: right; }
 .msg.system { justify-content: center; }
 .msg.system .bub { background: none; border: 1px dashed var(--line); color: var(--text-3); font-size: .8rem; text-align: center; max-width: 92%; }
@@ -474,7 +482,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 
 .modal-bg {
   position: fixed; inset: 0; z-index: 200;
-  background: rgba(4, 5, 9, .82); backdrop-filter: blur(5px);
+  background: rgba(52, 48, 90, .34); backdrop-filter: blur(6px);
   display: grid; place-items: center; padding: 18px;
   overflow-y: auto;
 }
@@ -526,8 +534,8 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
   background: var(--ink-3);
 }
 .pill.gold { border-color: var(--gold-dim); color: var(--gold); }
-.pill.olive { border-color: #3d5231; color: var(--olive); }
-.pill.violet { border-color: #4a3a5e; color: var(--violet); }
+.pill.olive { border-color: #B9EBD7; color: var(--olive); }
+.pill.violet { border-color: #D6CEF7; color: var(--violet); }
 
 .sep { height: 1px; background: var(--line-soft); margin: 16px 0; border: 0; }
 .mut { color: var(--text-3); }
@@ -553,13 +561,13 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
   box-shadow: var(--shadow); animation: mannaIn .3s ease;
 }
 .toast.gold { border-color: var(--gold-dim); color: var(--gold); }
-.toast.bad { border-color: #4a2b2d; color: #e2a9ab; }
+.toast.bad { border-color: #F8CDD2; color: #C24E5B; }
 
 /* ── the veil (WOOP gate) ───────────────────────────────────────────── */
 
 .veiled-overlay {
   position: absolute; inset: 0;
-  background: repeating-linear-gradient(45deg, rgba(0,0,0,.55), rgba(0,0,0,.55) 8px, rgba(0,0,0,.42) 8px, rgba(0,0,0,.42) 16px);
+  background: repeating-linear-gradient(45deg, rgba(243,240,252,.90), rgba(243,240,252,.90) 8px, rgba(226,219,246,.86) 8px, rgba(226,219,246,.86) 16px);
   display: grid; place-items: center; backdrop-filter: blur(2px);
   border-radius: var(--radius);
 }
@@ -569,7 +577,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .why-gate { text-align: center; padding: 12px 0; }
 .why-gate .why-text {
   font-family: var(--serif); font-size: 1.2rem; line-height: 1.6;
-  color: #efe7d3; padding: 18px; border: 1px solid var(--gold-dim);
+  color: var(--text); padding: 18px; border: 1px solid var(--gold-dim);
   border-radius: var(--radius); background: rgba(224,176,84,.05);
   margin-bottom: 14px; white-space: pre-wrap;
 }
@@ -607,7 +615,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .terr:hover, .terr:focus-visible {
   transform: translateY(-3px);
   border-color: var(--gold-dim);
-  box-shadow: 0 10px 28px rgba(0,0,0,.55);
+  box-shadow: 0 12px 26px rgba(88,68,168,.24);
 }
 .terr:active { transform: translateY(0); }
 .terr-art {
@@ -617,7 +625,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
   filter: saturate(.85);
 }
 .terr:hover .terr-art { transform: scale(1.07); filter: saturate(1.05); }
-.terr.unclaimed .terr-art { filter: grayscale(.85) brightness(.45); }
+.terr.unclaimed .terr-art { filter: grayscale(.75) brightness(1.06) saturate(.4); }
 .terr-scrim { position: absolute; inset: 0; pointer-events: none; }
 .terr-body {
   position: absolute; left: 0; right: 0; bottom: 0;
@@ -625,15 +633,15 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 }
 .terr-name {
   display: block; font-family: var(--serif); font-size: 1.02rem;
-  line-height: 1.15; text-shadow: 0 1px 6px rgba(0,0,0,.8);
+  line-height: 1.15; color: var(--text); text-shadow: 0 1px 5px rgba(255,255,255,.85);
 }
 .terr-count {
-  display: block; font-size: .7rem; color: rgba(255,255,255,.72);
+  display: block; font-size: .7rem; color: var(--text-2);
   letter-spacing: .05em; margin-top: 2px;
 }
 .terr-bar {
   display: block; height: 3px; margin-top: 7px;
-  background: rgba(255,255,255,.18); border-radius: 999px; overflow: hidden;
+  background: rgba(52,48,90,.16); border-radius: 999px; overflow: hidden;
 }
 .terr-bar > i {
   display: block; height: 100%; border-radius: 999px;
@@ -653,7 +661,7 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
   transition: border-color .15s, color .15s;
 }
 .why-fold > summary::-webkit-details-marker { display: none; }
-.why-fold > summary:hover { border-color: var(--water); color: #7fb0cf; }
+.why-fold > summary:hover { border-color: var(--water); color: #2E86C4; }
 .why-fold[open] > summary { margin-bottom: 9px; border-color: var(--water); }
 .why-fold .why { margin: 0; }
 
@@ -678,9 +686,10 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
   min-height: 148px; display: grid; place-items: center; text-align: center;
 }
 .hero-art { position: absolute; inset: 0; background-size: cover; background-position: center; }
-.hero-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(8,10,16,.45), rgba(8,10,16,.9)); }
+.hero-scrim { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(255,255,255,.30), rgba(255,255,255,.86)); }
 .hero-body { position: relative; padding: 22px 18px; }
-.hero-body h1 { font-family: var(--serif); font-size: 1.42rem; margin-bottom: 6px; }
+.hero-body h1 { font-family: var(--serif); font-size: 1.42rem; margin-bottom: 6px; color: var(--text); text-shadow: 0 1px 6px rgba(255,255,255,.9); }
+.hero-body .small { color: var(--text-2); }
 
 /* ── seed chips ─────────────────────────────────────────────────────────── */
 
@@ -699,6 +708,100 @@ input::placeholder, textarea::placeholder { color: #4e5164; }
 .seed-chip:hover { border-color: var(--gold-dim); background: var(--ink-4); }
 .seed-chip .sc-t { display: block; font-size: .84rem; font-weight: 500; }
 .seed-chip .sc-s { display: block; font-size: .68rem; color: var(--text-3); margin-top: 2px; }
+
+/* ── the character ──────────────────────────────────────────────────────── */
+
+.hero-char {
+  position: relative;
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  background: var(--ink-2);
+  margin-bottom: 14px;
+}
+.hero-char.tone-rest { border-color: #C5DEF3; }
+.hero-char.tone-waiting { border-color: #D6CEF7; }
+.hero-char canvas { display: block; width: 100%; }
+
+.char-body { padding: 12px 14px 14px; }
+.char-top { display: flex; align-items: flex-start; gap: 10px; }
+.char-top > div:first-child { flex: 1; min-width: 0; }
+.char-hud { display: flex; gap: 5px; flex-shrink: 0; }
+
+.char-name {
+  font-family: var(--serif); font-size: 1.16rem; line-height: 1.15;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.char-stage {
+  font-size: .7rem; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--gold-2); margin-top: 2px;
+}
+
+.xp {
+  height: 7px; margin: 10px 0 6px;
+  background: var(--ink-4); border-radius: 999px; overflow: hidden;
+  border: 1px solid var(--line-soft);
+}
+.xp > i {
+  display: block; height: 100%; border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-2), var(--gold));
+  box-shadow: 0 0 10px rgba(224,176,84,.5);
+  transition: width .8s cubic-bezier(.2,.8,.2,1);
+}
+.char-line {
+  display: flex; gap: 10px; align-items: baseline;
+  font-size: .76rem; color: var(--text-3);
+}
+.char-line span { flex: 1; min-width: 0; }
+.char-line b { color: var(--gold-2); font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* six vitals */
+.vitals {
+  display: grid; grid-template-columns: repeat(6, 1fr);
+  gap: 5px; margin-top: 12px;
+}
+.vital {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  background: none; border: 0; padding: 4px 0; cursor: pointer;
+  color: var(--text-3); font-size: .58rem; letter-spacing: .03em;
+  transition: color .15s, transform .12s;
+}
+.vital:hover { color: var(--text-2); transform: translateY(-2px); }
+.vital-ring {
+  width: 26px; height: 26px; border-radius: 50%;
+  background:
+    conic-gradient(hsl(var(--h) 62% 58%) var(--v), rgba(88,68,168,.10) 0),
+    var(--ink);
+  position: relative;
+  transition: filter .3s;
+}
+.vital-ring::after {
+  content: ''; position: absolute; inset: 4px;
+  border-radius: 50%; background: var(--ink-2);
+}
+.vital.waiting .vital-ring { filter: grayscale(.6) brightness(.75); }
+.vital.tended .vital-ring { box-shadow: 0 0 9px hsla(var(--h) 60% 55% / .5); }
+.vital-name { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.btn.wide { width: 100%; }
+
+/* deed size picker */
+.size-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 7px; }
+.size-chip {
+  display: block; text-align: left; cursor: pointer;
+  padding: 9px 11px; border: 1px solid var(--line);
+  border-radius: var(--radius-sm); background: var(--ink-3); color: var(--text);
+  transition: border-color .15s, background .15s;
+}
+.size-chip:hover { border-color: var(--text-3); }
+.size-chip.on { border-color: var(--gold); background: #FFF3DC; }
+.size-chip b { display: block; font-size: .88rem; }
+.size-chip span { display: block; font-size: .68rem; color: var(--text-3); margin-top: 1px; }
+.size-chip i { display: block; font-size: .7rem; color: var(--gold-2); font-style: normal; margin-top: 3px; }
+
+@media (max-width: 380px) {
+  .vitals { grid-template-columns: repeat(3, 1fr); }
+}
 </style>
 <div id="root"></div>
 <noscript><div style="padding:40px;font-family:system-ui;color:#e8e6e0;background:#0b0d14">
@@ -1877,25 +1980,30 @@ function artFor(key, hue = 42) {
   g.imageSmoothingQuality = 'high';
   g.drawImage(small, 0, 0, W, H);
 
-  // 3. A wash in the territory's hue, so the set reads as one system.
-  g.globalCompositeOperation = 'overlay';
-  g.fillStyle = `hsla(${hue}, 60%, 45%, .28)`;
+  // 3. Lift the sample out of the dark. The renders were shot at night; the
+  //    interface they live in now is daylight. Screening a mid grey raises
+  //    the blacks without flattening the highlights.
+  g.globalCompositeOperation = 'screen';
+  g.fillStyle = 'rgb(142, 138, 176)';
   g.fillRect(0, 0, W, H);
 
-  // 4. Deepen the base so light text always holds.
-  g.globalCompositeOperation = 'multiply';
-  const deep = g.createLinearGradient(0, 0, 0, H);
-  deep.addColorStop(0, 'rgba(255,255,255,1)');
-  deep.addColorStop(1, 'rgba(120,120,140,1)');
-  g.fillStyle = deep;
+  // 4. Hand it the territory's hue outright, keeping the render's luminance.
+  //    A translucent wash could not survive step 3 — it came out grey — so
+  //    the hue is applied as a blend rather than as a tint.
+  g.globalCompositeOperation = 'color';
+  g.fillStyle = `hsl(${hue}, 74%, 56%)`;
   g.fillRect(0, 0, W, H);
 
-  // 5. Vignette.
+  // 5. Toward pastel, and a haze at the foot where the title sits.
   g.globalCompositeOperation = 'source-over';
-  const vig = g.createRadialGradient(W / 2, H * 0.42, H * 0.15, W / 2, H / 2, H * 0.95);
-  vig.addColorStop(0, 'rgba(0,0,0,0)');
-  vig.addColorStop(1, 'rgba(4,5,9,.62)');
-  g.fillStyle = vig;
+  g.fillStyle = 'rgba(255,255,255,.26)';
+  g.fillRect(0, 0, W, H);
+
+  const haze = g.createLinearGradient(0, H, 0, H * 0.46);
+  haze.addColorStop(0, 'rgba(255,255,255,.90)');
+  haze.addColorStop(0.5, 'rgba(255,255,255,.42)');
+  haze.addColorStop(1, 'rgba(255,255,255,0)');
+  g.fillStyle = haze;
   g.fillRect(0, 0, W, H);
 
   const uri = c.toDataURL('image/jpeg', 0.82);
@@ -2264,6 +2372,7 @@ function emptyState() {
     manna: [],
     chronicle: [],
     letters: [],
+    deeds: [],
     circle: { code: null, joinedAt: null, members: [], messages: [] },
     settings: {
       sabbathEnabled: true,
@@ -2352,7 +2461,7 @@ function migrate(raw) {
     circle: { ...base.circle, ...(raw.circle || {}) },
   };
   // Arrays must be arrays even if a save was truncated or hand-edited.
-  for (const k of ['identities', 'boards', 'stones', 'quests', 'votes', 'pings', 'focusBlocks', 'manna', 'chronicle', 'letters']) {
+  for (const k of ['identities', 'boards', 'stones', 'quests', 'votes', 'pings', 'focusBlocks', 'manna', 'chronicle', 'letters', 'deeds']) {
     if (!Array.isArray(out[k])) out[k] = [];
   }
   // Remap territories from the earlier six-domain layout.
@@ -2453,6 +2562,21 @@ function addPing(state, { kind, lat, lng, label, note, questId }) {
  * driver of inner work life, and NOTICING it is part of the effect.
  * Nothing in this game completes silently.
  */
+function addDeed(state, { text, domain: dom, identityId, size, xp }) {
+  const deed = {
+    id: uid('ded'),
+    text: String(text || '').trim(),
+    domain: normalizeDomain(dom),
+    identityId: identityId || null,
+    size: size || 'small',
+    xp: xp || 10,
+    day: dayKey(),
+    ts: Date.now(),
+  };
+  state.deeds.unshift(deed);
+  return deed;
+}
+
 function chronicle(state, { kind, title, body, refs, meta }) {
   const entry = {
     id: uid('chr'),
@@ -4317,6 +4441,588 @@ function buildRecap(state, read = readState(state)) {
 }
 
 
+/* ─── core/character.js ─────────────────────────────────────── */
+
+/**
+ * character.js — the figure you are becoming, made visible.
+ *
+ * The complaint this answers is a fair one: a wall of text does not feel like
+ * a game. So the top of the daily screen is now a living figure that changes
+ * as you do — it levels, it gains gear, its ground greens, and its six vitals
+ * dim when a part of your life goes untended.
+ *
+ * It is not a pet. It is you — the person the identity statements name. That
+ * is the whole Be > Do > Have idea rendered instead of described: you can
+ * literally watch the evidence accumulate into a figure.
+ *
+ * ── THE ONE RULE THIS FILE KEEPS ─────────────────────────────────────────
+ * Neglect DIMS. It never kills, starves, or scolds.
+ *
+ * A Tamagotchi that dies is using loss aversion, and loss aversion applied to
+ * a person's own life goals is the what-the-hell effect waiting to happen
+ * (Cochran & Tesser) — one bad week and the whole thing gets abandoned. So a
+ * vital fades toward a floor and waits. Coming back lifts it immediately.
+ */
+
+/**
+ * Stages the figure passes through. Thresholds are levels, and the gear is
+ * cumulative — each stage keeps what the last one carried.
+ */
+const STAGES = [
+  { at: 1, key: 'ember', name: 'Ember', line: 'A spark, and no evidence yet. Everyone starts here.' },
+  { at: 3, key: 'lamp', name: 'Lamp', line: 'Enough light for the next step.' },
+  { at: 6, key: 'runner', name: 'Runner', line: 'Moving, and it shows.' },
+  { at: 11, key: 'builder', name: 'Builder', line: 'Things now exist that did not before.' },
+  { at: 18, key: 'steward', name: 'Steward', line: 'Trusted with more than your own.' },
+  { at: 27, key: 'watchman', name: 'Watchman', line: 'You see further than your own ground.' },
+  { at: 40, key: 'elder', name: 'Elder', line: 'Others are running because you did.' },
+];
+
+/** XP needed to reach a level. Gentle early, steepening — a normal RPG curve. */
+function xpForLevel(level) {
+  if (level <= 1) return 0;
+  let total = 0;
+  for (let n = 2; n <= level; n++) total += Math.round(60 * Math.pow(n - 1, 1.35));
+  return total;
+}
+
+function levelFromXp(xp) {
+  let level = 1;
+  while (level < 200 && xp >= xpForLevel(level + 1)) level++;
+  return level;
+}
+
+function stageFor(level) {
+  let s = STAGES[0];
+  for (const st of STAGES) if (level >= st.at) s = st;
+  return s;
+}
+
+function nextStage(level) {
+  return STAGES.find((s) => s.at > level) || null;
+}
+
+/**
+ * A territory's vital: how tended this part of your life is right now.
+ *
+ * Half-life decay from the last time you did something there, lifted by how
+ * much you have done there overall. Floors at 0.12 — dim, never dark, never
+ * gone. Coming back after a month lifts it the moment you act.
+ */
+function vitalFor({ lastDay, total, today = dayKey(), halfLife = 6 }) {
+  if (!lastDay || !total) return { value: 0.12, days: null, state: 'untouched' };
+  const days = Math.max(0, daysBetween(lastDay, today));
+  const freshness = Math.pow(0.5, days / halfLife);
+  // Depth: a territory you have worked twenty times holds its colour longer.
+  const depth = clamp(Math.log(1 + total) / Math.log(1 + 20), 0, 1);
+  const value = clamp(0.12 + (0.88 * freshness) * (0.55 + 0.45 * depth), 0.12, 1);
+  return {
+    value,
+    days,
+    total,
+    state: days === 0 ? 'tended' : days <= 3 ? 'warm' : days <= 10 ? 'cooling' : 'waiting',
+  };
+}
+
+/**
+ * Read the whole character from game state.
+ *
+ * @param {object} state
+ * @param {object} read situational read from guide.js
+ */
+function readCharacter(state, read, DOMAINS) {
+  const completed = state.quests.filter((q) => q.completedAt);
+  const deeds = state.deeds || [];
+
+  // XP: steps carry the most, focus minutes and logged deeds carry real weight.
+  const stepXp = completed.reduce((a, q) => a + (q.xpAwarded || 20), 0);
+  const focusXp = state.focusBlocks.reduce((a, b) => a + Math.round((b.minutes || 0) * 0.8), 0);
+  const deedXp = deeds.reduce((a, d) => a + (d.xp || 15), 0);
+  const stoneXp = state.stones.filter((s) => s.completedAt).length * 150;
+  const xp = stepXp + focusXp + deedXp + stoneXp;
+
+  const level = levelFromXp(xp);
+  const stage = stageFor(level);
+  const next = nextStage(level);
+  const floor = xpForLevel(level);
+  const ceil = xpForLevel(level + 1);
+
+  // Vitals, one per territory, from steps AND logged deeds.
+  const vitals = {};
+  for (const d of DOMAINS) {
+    const events = [
+      ...completed
+        .map((q) => ({ day: dayKey(new Date(q.completedAt)), domain: domainOfQuest(q, state) }))
+        .filter((e) => e.domain === d.key),
+      ...deeds.filter((x) => x.domain === d.key).map((x) => ({ day: x.day })),
+    ].sort((a, b) => (a.day < b.day ? 1 : -1));
+
+    vitals[d.key] = {
+      ...vitalFor({ lastDay: events[0]?.day, total: events.length, today: read.today }),
+      domain: d,
+    };
+  }
+
+  const values = Object.values(vitals).map((v) => v.value);
+  const wholeness = values.reduce((a, b) => a + b, 0) / (values.length || 1);
+  const weakest = Object.values(vitals).sort((a, b) => a.value - b.value)[0];
+
+  return {
+    xp,
+    level,
+    stage,
+    nextStage: next,
+    intoLevel: xp - floor,
+    levelSpan: Math.max(1, ceil - floor),
+    levelProgress: clamp((xp - floor) / Math.max(1, ceil - floor), 0, 1),
+    xpToNext: Math.max(0, ceil - xp),
+    vitals,
+    wholeness,
+    weakest,
+    streak: read.streak.current,
+    grace: read.streak.tokens,
+    resting: Boolean(read.sabbath.locked),
+    name: state.player.newName || state.player.name || 'Runner',
+    breakdown: { stepXp, focusXp, deedXp, stoneXp },
+  };
+}
+
+/** Which territory a completed quest belongs to, via its stone. */
+function domainOfQuest(quest, state) {
+  const stone = state.stones.find((s) => s.id === quest.stoneId);
+  if (stone) return stone.domain;
+  const identity = state.identities.find((i) => i.id === quest.identityId);
+  return identity?.domain || null;
+}
+
+/**
+ * What the figure has to say about its own condition. One line, in its own
+ * voice, chosen from the state — never a scolding.
+ */
+function characterMood(ch) {
+  if (ch.resting) return { tone: 'rest', line: 'Resting. The lamp is still lit.' };
+  if (ch.streak >= 21) return { tone: 'strong', line: `${ch.streak} days standing. This is who you are now.` };
+  if (ch.streak >= 7) return { tone: 'strong', line: `${ch.streak} days standing.` };
+  if (ch.weakest && ch.weakest.state === 'waiting') {
+    return { tone: 'waiting', line: `${ch.weakest.domain.name} has been waiting ${ch.weakest.days} days. It is still there.` };
+  }
+  if (ch.wholeness > 0.7) return { tone: 'strong', line: 'Every territory is tended.' };
+  if (ch.xp === 0) return { tone: 'new', line: 'No evidence yet. That is exactly where Gideon was standing.' };
+  return { tone: 'steady', line: 'Steady. One step moves the whole figure.' };
+}
+
+/**
+ * What to say when the level went up but the stage did not.
+ *
+ * The stage line is a description of the stage, not of the moment — showing
+ * Ember's "no evidence yet" to someone who has just logged a landmark reads
+ * as the game ignoring what they did. So a level inside a stage gets its own
+ * line, and it always points at the next thing (goal-gradient: the pull is
+ * strongest when the remaining distance is visible).
+ */
+function levelUpLine(ch) {
+  const next = ch.nextStage;
+  if (next) return `The figure stands a little taller. ${ch.xpToNext} XP to ${next.name}.`;
+  return `The figure stands a little taller. ${ch.xpToNext} XP to level ${ch.level + 1}.`;
+}
+
+/** XP a logged deed is worth, by how big the player says it was. */
+const DEED_SIZES = [
+  { key: 'small', label: 'Small', xp: 10, line: 'A rep. It counts.' },
+  { key: 'real', label: 'Real', xp: 25, line: 'A proper piece of work.' },
+  { key: 'big', label: 'Big', xp: 60, line: 'A day that moved something.' },
+  { key: 'landmark', label: 'Landmark', xp: 150, line: 'You will remember this one.' },
+];
+
+function deedSize(key) {
+  return DEED_SIZES.find((d) => d.key === key) || DEED_SIZES[0];
+}
+
+
+/* ─── ui/avatar.js ─────────────────────────────────────── */
+
+/**
+ * avatar.js — draws the figure.
+ *
+ * Everything here is procedural canvas: no sprite sheet to ship, it scales to
+ * any screen, and each stage is a real change in the drawing rather than a
+ * swapped asset.
+ *
+ * The look is soft and daylit — rounded shapes, pastel hills, a friendly
+ * character with a big head and big eyes. The scene is not decoration: the
+ * six hills ARE the six territories, their colour and height are the vitals,
+ * the sun rises with the streak, and the character's gear is its stage. If
+ * you can read the picture you can read the save file.
+ */
+
+const STAGE_ORDER = ['ember', 'lamp', 'runner', 'builder', 'steward', 'watchman', 'elder'];
+
+function has(stageKey, feature) {
+  const i = STAGE_ORDER.indexOf(stageKey);
+  const need = {
+    lamp: 1,       // carries a lamp
+    cloak: 2,      // a cloak
+    staff: 3,      // a staff
+    mantle: 4,     // a broader mantle
+    watchtower: 5, // a rise underfoot
+    radiance: 6,   // the figure gives off light
+  }[feature];
+  return need !== undefined && i >= need;
+}
+
+/** A rounded blob — the only primitive this whole drawing really needs. */
+function blob(g, x, y, rx, ry) {
+  g.beginPath();
+  g.ellipse(x, y, rx, ry, 0, 0, Math.PI * 2);
+  g.fill();
+}
+
+/**
+ * @param {HTMLCanvasElement} cv
+ * @param {object} ch      from readCharacter()
+ * @param {Array} DOMAINS
+ * @param {number} t       animation phase, seconds
+ */
+function drawAvatar(cv, ch, DOMAINS, t = 0) {
+  const cssW = cv.clientWidth || cv.parentElement?.clientWidth || 360;
+  const cssH = Math.round(cssW * 0.72);
+  const dpr = Math.min(2, globalThis.devicePixelRatio || 1);
+  cv.width = Math.round(cssW * dpr);
+  cv.height = Math.round(cssH * dpr);
+  cv.style.height = `${cssH}px`;
+  const g = cv.getContext('2d');
+  g.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  const W = cssW, H = cssH;
+  const stage = ch.stage.key;
+  const breathe = Math.sin(t * 1.1) * 0.5 + 0.5;
+  const flicker = 0.88 + Math.sin(t * 6.3) * 0.06 + Math.sin(t * 11.7) * 0.04;
+  const warmth = clamp(ch.wholeness, 0, 1);
+  const dawn = clamp(ch.streak / 30, 0, 1);
+  const restful = ch.resting;
+
+  g.clearRect(0, 0, W, H);
+
+  // ── sky ────────────────────────────────────────────────────────────────
+  // Evening blue while resting; otherwise a soft morning that warms as more
+  // of your life is tended.
+  const sky = g.createLinearGradient(0, 0, 0, H);
+  if (restful) {
+    sky.addColorStop(0, '#B9C9F0');
+    sky.addColorStop(0.55, '#D6D2F2');
+    sky.addColorStop(1, '#F0DCEC');
+  } else {
+    sky.addColorStop(0, `hsl(${205 - warmth * 6}, ${62 + warmth * 12}%, ${86 - warmth * 2}%)`);
+    sky.addColorStop(0.52, `hsl(${38 + warmth * 4}, ${72 + warmth * 16}%, ${93 - warmth * 3}%)`);
+    sky.addColorStop(1, `hsl(${32 + warmth * 6}, ${80 + warmth * 12}%, ${90 - warmth * 4}%)`);
+  }
+  g.fillStyle = sky;
+  g.fillRect(0, 0, W, H);
+
+  const groundY = H * 0.78;
+  const cx = W / 2;
+
+  // ── the sun, rising with the streak ────────────────────────────────────
+  const sunX = W * 0.79;
+  const sunY = H * (0.34 - dawn * 0.14);
+  const sunR = Math.max(9, W * 0.045);
+  const halo = g.createRadialGradient(sunX, sunY, sunR * 0.6, sunX, sunY, sunR * 4.4);
+  halo.addColorStop(0, `rgba(255, 214, 130, ${0.34 + dawn * 0.26})`);
+  halo.addColorStop(1, 'rgba(255, 214, 130, 0)');
+  g.fillStyle = halo;
+  g.fillRect(0, 0, W, H);
+  g.fillStyle = restful ? '#EFEAFB' : `hsl(44, 100%, ${76 + dawn * 8}%)`;
+  blob(g, sunX, sunY, sunR, sunR);
+
+  // ── clouds, drifting ───────────────────────────────────────────────────
+  const cloud = (px, py, s, alpha) => {
+    g.fillStyle = `rgba(255,255,255,${alpha})`;
+    blob(g, px, py, s * 1.5, s * 0.72);
+    blob(g, px - s * 0.95, py + s * 0.16, s * 0.85, s * 0.5);
+    blob(g, px + s * 1.0, py + s * 0.2, s * 0.75, s * 0.44);
+  };
+  const drift = (t * 5) % (W + 200);
+  cloud(((W * 0.18 + drift) % (W + 200)) - 100, H * 0.17, W * 0.045, 0.82);
+  cloud(((W * 0.62 + drift * 0.6) % (W + 200)) - 100, H * 0.29, W * 0.034, 0.62);
+  cloud(((W * 0.92 + drift * 0.35) % (W + 200)) - 100, H * 0.10, W * 0.026, 0.5);
+
+  // ── six hills, one per territory ───────────────────────────────────────
+  // Height and colour are the vital. A neglected territory does not vanish —
+  // it goes pale and low, and it is still standing there when you come back.
+  const bandW = W / DOMAINS.length;
+  const order = [0, 3, 1, 4, 2, 5];   // interleave so neighbours differ in hue
+  order.forEach((di, slot) => {
+    const d = DOMAINS[di];
+    const v = ch.vitals[d.key]?.value ?? 0.12;
+    const hx = slot * bandW + bandW / 2;
+    const rise = H * (0.045 + v * 0.115);
+    const rx = bandW * 0.92;
+
+    g.beginPath();
+    g.moveTo(hx - rx, groundY + 4);
+    g.bezierCurveTo(hx - rx * 0.52, groundY - rise, hx + rx * 0.52, groundY - rise, hx + rx, groundY + 4);
+    g.closePath();
+    const hg = g.createLinearGradient(0, groundY - rise, 0, groundY + 6);
+    hg.addColorStop(0, `hsl(${d.hue}, ${24 + v * 46}%, ${88 - v * 18}%)`);
+    hg.addColorStop(1, `hsl(${d.hue}, ${18 + v * 34}%, ${80 - v * 16}%)`);
+    g.fillStyle = hg;
+    g.fill();
+
+    // a lit crown on a hill that has been tended lately
+    if (v > 0.3) {
+      g.beginPath();
+      g.moveTo(hx - rx * 0.62, groundY - rise * 0.30);
+      g.bezierCurveTo(hx - rx * 0.30, groundY - rise, hx + rx * 0.30, groundY - rise, hx + rx * 0.62, groundY - rise * 0.30);
+      g.strokeStyle = `hsla(${d.hue}, 78%, 74%, ${(v - 0.3) * 0.85})`;
+      g.lineWidth = 2.4;
+      g.lineCap = 'round';
+      g.stroke();
+    }
+  });
+
+  // ── the meadow the figure stands on ────────────────────────────────────
+  const meadow = g.createLinearGradient(0, groundY, 0, H);
+  meadow.addColorStop(0, `hsl(${96 + warmth * 16}, ${38 + warmth * 22}%, ${80 - warmth * 6}%)`);
+  meadow.addColorStop(1, `hsl(${96 + warmth * 16}, ${34 + warmth * 20}%, ${72 - warmth * 6}%)`);
+  g.fillStyle = meadow;
+  g.beginPath();
+  g.moveTo(-2, groundY + H * 0.055);
+  g.bezierCurveTo(W * 0.26, groundY - H * 0.052, W * 0.72, groundY - H * 0.052, W + 2, groundY + H * 0.055);
+  g.lineTo(W + 2, H);
+  g.lineTo(-2, H);
+  g.closePath();
+  g.fill();
+
+  // a lit strip along the crest, so the meadow rolls instead of sitting flat
+  g.beginPath();
+  g.moveTo(-2, groundY + H * 0.055);
+  g.bezierCurveTo(W * 0.26, groundY - H * 0.052, W * 0.72, groundY - H * 0.052, W + 2, groundY + H * 0.055);
+  g.strokeStyle = `hsla(${92 + warmth * 16}, ${58 + warmth * 20}%, ${88 - warmth * 4}%, .85)`;
+  g.lineWidth = Math.max(2, H * 0.012);
+  g.stroke();
+
+  // a few tufts, for somewhere to stand rather than a green rectangle
+  g.fillStyle = `hsla(${100 + warmth * 12}, 40%, ${66 - warmth * 4}%, .5)`;
+  for (let i = 0; i < 7; i++) {
+    const tx = ((i * 137) % 100) / 100 * W;
+    const ty = groundY + H * (0.075 + ((i * 37) % 9) / 100);
+    blob(g, tx, ty, W * 0.022, H * 0.008);
+  }
+
+  // ── the rise, once the figure has earned one ───────────────────────────
+  const standY = groundY + H * 0.012;
+  let feetY = standY;
+  if (has(stage, 'watchtower')) {
+    g.fillStyle = `hsl(${100 + warmth * 14}, 34%, ${74 - warmth * 4}%)`;
+    g.beginPath();
+    g.moveTo(cx - W * 0.20, standY + 2);
+    g.quadraticCurveTo(cx, standY - H * 0.10, cx + W * 0.20, standY + 2);
+    g.closePath();
+    g.fill();
+    feetY = standY - H * 0.058;
+  }
+
+  // ── proportions: a big head and a small round body ─────────────────────
+  const grow = 0.80 + clamp(Math.log(1 + ch.level) / Math.log(1 + 40), 0, 1) * 0.20;
+  const figH = H * 0.50 * grow;
+  const bob = Math.sin(t * 1.15) * (figH * 0.014);
+
+  const headR = figH * 0.185;
+  const headY = feetY - figH + headR + bob;
+  const bodyTop = headY + headR * 0.80;
+  const legLen = figH * 0.13;
+  const bodyBot = feetY - legLen;
+  const bodyCy = (bodyTop + bodyBot) / 2;
+  const bodyRx = figH * 0.155;
+  const bodyRy = (bodyBot - bodyTop) / 2 + figH * 0.02;
+
+  const handL = { x: cx - bodyRx * 1.52, y: bodyCy + bodyRy * 0.30 };
+  const handR = { x: cx + bodyRx * 1.50, y: bodyCy + bodyRy * 0.24 };
+
+  const SKIN = '#F6D3B0';
+  const SKIN_DARK = '#E3B891';
+  const TUNIC = has(stage, 'mantle') ? '#F3C367' : '#9B8BEA';
+  const TUNIC_DARK = has(stage, 'mantle') ? '#DFA83F' : '#8272DF';
+
+  // ── radiance, at the last stages ───────────────────────────────────────
+  if (has(stage, 'radiance')) {
+    const aura = g.createRadialGradient(cx, bodyCy, figH * 0.1, cx, bodyCy, figH * 1.25);
+    aura.addColorStop(0, `rgba(255, 226, 150, ${0.42 + breathe * 0.16})`);
+    aura.addColorStop(1, 'rgba(255, 226, 150, 0)');
+    g.fillStyle = aura;
+    g.fillRect(0, 0, W, H);
+  }
+
+  // ── the shadow it stands in ────────────────────────────────────────────
+  g.fillStyle = 'rgba(96, 78, 140, .16)';
+  blob(g, cx, feetY + figH * 0.012, bodyRx * 1.18, figH * 0.032);
+
+  // ── staff, planted behind ──────────────────────────────────────────────
+  if (has(stage, 'staff')) {
+    g.beginPath();
+    g.moveTo(handR.x + figH * 0.03, feetY);
+    g.lineTo(handR.x + figH * 0.005, headY - headR * 1.15);
+    g.strokeStyle = '#C79A63';
+    g.lineWidth = Math.max(2.2, figH * 0.026);
+    g.lineCap = 'round';
+    g.stroke();
+    g.fillStyle = '#8FDCC0';
+    blob(g, handR.x + figH * 0.005, headY - headR * 1.2, figH * 0.036, figH * 0.036);
+  }
+
+  // ── cloak, hanging behind the body ─────────────────────────────────────
+  if (has(stage, 'cloak')) {
+    const sway = Math.sin(t * 0.9) * figH * 0.014;
+    g.beginPath();
+    g.moveTo(cx - bodyRx * 0.92, bodyTop + figH * 0.02);
+    g.quadraticCurveTo(cx - bodyRx * 1.42 + sway, bodyCy, cx - bodyRx * 1.26 + sway, feetY - figH * 0.02);
+    g.quadraticCurveTo(cx + sway, feetY + figH * 0.05, cx + bodyRx * 1.26 + sway, feetY - figH * 0.02);
+    g.quadraticCurveTo(cx + bodyRx * 1.42 + sway, bodyCy, cx + bodyRx * 0.92, bodyTop + figH * 0.02);
+    g.closePath();
+    g.fillStyle = has(stage, 'mantle') ? '#E4894A' : '#6E5FC9';
+    g.fill();
+    g.strokeStyle = 'rgba(255,255,255,.55)';
+    g.lineWidth = 1.4;
+    g.stroke();
+  }
+
+  // ── legs and feet ──────────────────────────────────────────────────────
+  for (const dir of [-1, 1]) {
+    g.strokeStyle = SKIN_DARK;
+    g.lineWidth = figH * 0.052;
+    g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(cx + dir * bodyRx * 0.44, bodyBot - figH * 0.01);
+    g.lineTo(cx + dir * bodyRx * 0.46, feetY - figH * 0.018);
+    g.stroke();
+    g.fillStyle = '#6E62B8';
+    blob(g, cx + dir * bodyRx * 0.48, feetY - figH * 0.012, figH * 0.05, figH * 0.028);
+  }
+
+  // ── body ───────────────────────────────────────────────────────────────
+  g.fillStyle = TUNIC;
+  blob(g, cx, bodyCy, bodyRx, bodyRy);
+  // a soft shaded underside so it reads as round
+  g.fillStyle = TUNIC_DARK;
+  g.beginPath();
+  g.ellipse(cx, bodyCy, bodyRx, bodyRy, 0, Math.PI * 0.12, Math.PI * 0.88);
+  g.fill();
+  g.fillStyle = TUNIC;
+  blob(g, cx, bodyCy - bodyRy * 0.12, bodyRx * 0.94, bodyRy * 0.86);
+
+  // ── arms ───────────────────────────────────────────────────────────────
+  for (const [dir, hand] of [[-1, handL], [1, handR]]) {
+    g.strokeStyle = TUNIC_DARK;
+    g.lineWidth = figH * 0.048;
+    g.lineCap = 'round';
+    g.beginPath();
+    g.moveTo(cx + dir * bodyRx * 0.82, bodyCy - bodyRy * 0.18);
+    g.quadraticCurveTo(cx + dir * bodyRx * 1.44, bodyCy, hand.x, hand.y);
+    g.stroke();
+    g.fillStyle = SKIN;
+    blob(g, hand.x, hand.y, figH * 0.035, figH * 0.035);
+  }
+
+  // ── head ───────────────────────────────────────────────────────────────
+  g.fillStyle = SKIN;
+  blob(g, cx, headY, headR, headR * 0.96);
+  // hair, as a soft cap
+  g.fillStyle = '#5B4A78';
+  g.beginPath();
+  g.ellipse(cx, headY - headR * 0.16, headR * 0.99, headR * 0.82, 0, Math.PI, Math.PI * 2);
+  g.fill();
+  g.beginPath();
+  g.ellipse(cx, headY - headR * 0.06, headR, headR * 0.92, 0, Math.PI * 1.06, Math.PI * 1.34);
+  g.lineWidth = headR * 0.2;
+  g.strokeStyle = '#5B4A78';
+  g.stroke();
+
+  // eyes — the whole reason the figure reads as friendly
+  const blink = (Math.sin(t * 0.7) > 0.985) ? 0.12 : 1;
+  const eyeR = headR * 0.145;
+  for (const dir of [-1, 1]) {
+    g.fillStyle = '#3B3357';
+    blob(g, cx + dir * headR * 0.37, headY + headR * 0.10, eyeR, eyeR * 1.12 * blink);
+    if (blink > 0.5) {
+      g.fillStyle = 'rgba(255,255,255,.92)';
+      blob(g, cx + dir * headR * 0.37 + eyeR * 0.32, headY + headR * 0.10 - eyeR * 0.36, eyeR * 0.34, eyeR * 0.34);
+    }
+  }
+  // blush
+  g.fillStyle = 'rgba(255, 150, 150, .34)';
+  blob(g, cx - headR * 0.66, headY + headR * 0.36, headR * 0.19, headR * 0.13);
+  blob(g, cx + headR * 0.66, headY + headR * 0.36, headR * 0.19, headR * 0.13);
+  // mouth — a small, calm smile
+  g.beginPath();
+  g.arc(cx, headY + headR * 0.26, headR * 0.20, Math.PI * 0.18, Math.PI * 0.82);
+  g.strokeStyle = '#3B3357';
+  g.lineWidth = Math.max(1.2, headR * 0.075);
+  g.lineCap = 'round';
+  g.stroke();
+
+  // ── the lamp, hanging from the near hand ───────────────────────────────
+  if (has(stage, 'lamp')) {
+    const lx = handL.x - figH * 0.030;
+    const ly = handL.y + figH * 0.070;
+    const lampGlow = (0.45 + dawn * 0.55) * flicker;
+
+    const lampHalo = g.createRadialGradient(lx, ly, 1, lx, ly, figH * 0.5);
+    lampHalo.addColorStop(0, `rgba(255, 206, 110, ${0.42 * lampGlow})`);
+    lampHalo.addColorStop(1, 'rgba(255, 206, 110, 0)');
+    g.fillStyle = lampHalo;
+    g.fillRect(0, 0, W, H);
+
+    g.beginPath();
+    g.moveTo(handL.x, handL.y);
+    g.lineTo(lx, ly - figH * 0.040);
+    g.strokeStyle = '#B79A6B';
+    g.lineWidth = Math.max(1.4, figH * 0.012);
+    g.stroke();
+
+    g.fillStyle = '#FFC24D';
+    blob(g, lx, ly, figH * 0.042, figH * 0.048);
+    g.fillStyle = `rgba(255, 246, 205, ${0.7 + 0.3 * flicker})`;
+    blob(g, lx, ly, figH * 0.024, figH * 0.028);
+  } else {
+    // the ember, before there is a lamp — cupped between the hands
+    const ex = cx;
+    const ey = (handL.y + handR.y) / 2 + figH * 0.02;
+    const eg = g.createRadialGradient(ex, ey, 0, ex, ey, figH * 0.26);
+    eg.addColorStop(0, `rgba(255, 152, 84, ${0.5 * flicker})`);
+    eg.addColorStop(1, 'rgba(255, 152, 84, 0)');
+    g.fillStyle = eg;
+    g.fillRect(0, 0, W, H);
+    g.fillStyle = `rgba(255, 178, 96, ${0.8 + 0.2 * flicker})`;
+    blob(g, ex, ey, figH * 0.026, figH * 0.026);
+  }
+
+  // ── resting mark ───────────────────────────────────────────────────────
+  if (restful) {
+    g.fillStyle = 'rgba(94, 84, 148, .62)';
+    g.font = `700 ${Math.max(9, W / 38)}px ui-rounded, ui-sans-serif, system-ui, sans-serif`;
+    g.textAlign = 'center';
+    g.fillText('RESTING', cx, H - 9);
+  }
+}
+
+/** Keep the figure breathing while its view is on screen. */
+function animateAvatar(cv, getCh, DOMAINS) {
+  let raf = 0;
+  let stopped = false;
+  const reduce = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+  const t0 = performance.now();
+
+  const frame = () => {
+    if (stopped || !cv.isConnected) return;
+    const ch = getCh();
+    if (ch) drawAvatar(cv, ch, DOMAINS, reduce ? 0 : (performance.now() - t0) / 1000);
+    if (!reduce) raf = requestAnimationFrame(frame);
+  };
+  frame();
+  return () => { stopped = true; cancelAnimationFrame(raf); };
+}
+
+
 /* ─── ui/views.js ─────────────────────────────────────── */
 
 /**
@@ -4326,6 +5032,7 @@ function buildRecap(state, read = readState(state)) {
  * messages and identity statements are all free text, and chat text arrives
  * from other people.
  */
+
 
 
 
@@ -4387,10 +5094,97 @@ function initials(name) {
   return String(name || '?').trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
+
+/**
+ * The character panel — the top of the daily screen.
+ *
+ * Deliberately placed above the step: the answer to "where are the visuals"
+ * is that you should meet the figure before you meet any words.
+ */
+function characterPanel(ch) {
+  const mood = characterMood(ch);
+  const next = ch.nextStage;
+  return `<section class="hero-char tone-${esc(mood.tone)}" data-testid="character">
+    <canvas id="avatar-canvas" aria-label="Your figure at level ${ch.level}"></canvas>
+    <div class="char-body">
+      <div class="char-top">
+        <div>
+          <div class="char-name">${esc(ch.name)}</div>
+          <div class="char-stage">${esc(ch.stage.name)} · Level ${ch.level}</div>
+        </div>
+        <div class="char-hud">
+          ${ch.streak ? `<span class="hud-chip gold" title="days standing">▲ ${ch.streak}</span>` : ''}
+          <span class="hud-chip" title="grace">✦ ${ch.grace}</span>
+        </div>
+      </div>
+
+      <div class="xp" title="${ch.intoLevel} / ${ch.levelSpan} XP">
+        <i style="width:${pct(ch.levelProgress)}%"></i>
+      </div>
+      <div class="char-line">
+        <span>${esc(mood.line)}</span>
+        <b data-testid="xp-to-next">${next ? `${ch.xpToNext} XP to ${esc(next.name)}` : `${ch.xpToNext} XP to level ${ch.level + 1}`}</b>
+      </div>
+
+      <div class="vitals" data-testid="vitals">
+        ${Object.values(ch.vitals).map((v) => `
+          <button class="vital ${esc(v.state)}" data-act="open-territory" data-domain="${esc(v.domain.key)}"
+                  data-testid="vital-${esc(v.domain.key)}"
+                  title="${esc(v.domain.name)} — ${v.days === null ? 'never tended' : v.days === 0 ? 'tended today' : v.days + ' days since'}">
+            <span class="vital-ring" style="--v:${pct(v.value)}%;--h:${v.domain.hue}"></span>
+            <span class="vital-name">${esc(v.domain.name.split(' ')[0])}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+/** The log-what-you-did composer. */
+function deedModal(ctx, presetDomain = null) {
+  const { state } = ctx;
+  return `
+  <div class="eyebrow">Evidence</div>
+  <h2>What did you do?</h2>
+  <p class="small mut">It does not have to have been on the list. If it happened, it counts — it feeds the territory and it casts a vote.</p>
+  <div class="field">
+    <label for="d-text">In your own words</label>
+    <input type="text" id="d-text" placeholder="Closed the Anderson deal" data-testid="d-text">
+  </div>
+  <div class="field">
+    <label for="d-domain">Which territory?</label>
+    <select id="d-domain" data-testid="d-domain">
+      ${DOMAINS.map((d) => `<option value="${esc(d.key)}" ${presetDomain === d.key ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}
+    </select>
+  </div>
+  <div class="field">
+    <label>How big was it?</label>
+    <div class="size-row" data-testid="d-sizes">
+      ${DEED_SIZES.map((z, i) => `
+        <button type="button" class="size-chip ${i === 0 ? 'on' : ''}" data-act="pick-size" data-size="${esc(z.key)}" data-testid="size-${esc(z.key)}">
+          <b>${esc(z.label)}</b><span>${esc(z.line)}</span><i>+${z.xp}</i>
+        </button>`).join('')}
+    </div>
+    <input type="hidden" id="d-size" value="small">
+  </div>
+  ${state.identities.length ? `
+  <div class="field">
+    <label for="d-identity">Who does this prove you are?</label>
+    <select id="d-identity" data-testid="d-identity">
+      <option value="">— no identity —</option>
+      ${state.identities.map((i) => `<option value="${esc(i.id)}">${esc(i.statement)}</option>`).join('')}
+    </select>
+  </div>` : ''}
+  <div id="deed-errors"></div>
+  <div class="btn-row mt16">
+    <button class="btn primary" data-act="deed-save" data-testid="deed-save">Log it</button>
+    <button class="btn ghost" data-act="close-modal">Cancel</button>
+  </div>`;
+}
+
 // ── TODAY ─────────────────────────────────────────────────────────────────
 
 function todayView(ctx) {
-  const { step, word, read, state, growth } = ctx;
+  const { step, word, read, state, growth, character } = ctx;
   const tone = step.tone || 'action';
 
   const actionBtn = step.action
@@ -4408,6 +5202,8 @@ function todayView(ctx) {
     : '';
 
   return `
+  ${character ? characterPanel(character) : ''}
+
   <section class="step tone-${esc(tone)}" data-testid="next-step">
     <div class="eyebrow">${step.kind === 'sabbath' ? 'The Sabbath' : 'The next step'}</div>
     <h1>${esc(step.title)}</h1>
@@ -4421,6 +5217,10 @@ function todayView(ctx) {
     ${verseBlock(step.verse)}
     ${whyBlock(step.why)}
   </section>
+
+  <div class="btn-row mt16">
+    <button class="btn primary wide" data-act="new-deed" data-testid="btn-log-deed">✎ Log something I did</button>
+  </div>
 
   ${growth ? growthStrip(growth) : ''}
 
@@ -5093,8 +5893,8 @@ function runningFocusModal(st) {
   <div class="timer ${st.resting ? 'resting' : ''}">
     <div class="ring">
       <svg width="168" height="168">
-        <circle cx="84" cy="84" r="${R}" fill="none" stroke="#232838" stroke-width="8"></circle>
-        <circle cx="84" cy="84" r="${R}" fill="none" stroke="${st.resting ? '#5b8fb0' : '#e0b054'}" stroke-width="8"
+        <circle cx="84" cy="84" r="${R}" fill="none" stroke="#E7E1F7" stroke-width="8"></circle>
+        <circle cx="84" cy="84" r="${R}" fill="none" stroke="${st.resting ? '#57ABE6' : '#F5AE3C'}" stroke-width="8"
           stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"></circle>
       </svg>
       <div class="ring-mid"><div class="clock" data-testid="focus-clock">${mm}:${ss}</div></div>
@@ -5209,7 +6009,7 @@ function onboardingView(ctx) {
 }
 
 
-const V = { verseBlock, domainVerse, whyBlock, todayView, visionView, woopModal, identityView, whyModal, whyGateModal, mapView, growthView, circleView, chronicleView, codexView, questModal, focusModal, runningFocusModal, settingsView, onboardingView };
+const V = { verseBlock, domainVerse, whyBlock, characterPanel, deedModal, todayView, visionView, woopModal, identityView, whyModal, whyGateModal, mapView, growthView, circleView, chronicleView, codexView, questModal, focusModal, runningFocusModal, settingsView, onboardingView };
 
 
 /* ─── app.js ─────────────────────────────────────── */
@@ -5220,6 +6020,8 @@ const V = { verseBlock, domainVerse, whyBlock, todayView, visionView, woopModal,
  * The controller. Loads state, decides what to show, draws the maps and the
  * chart, and owns every user action.
  */
+
+
 
 
 
@@ -5252,6 +6054,7 @@ const App = {
   pendingQuest: null,
   whyGate: null,
   whyGateTimer: null,
+  avatarStop: null,
 };
 
 globalThis.__ACHIEVE = App; // test hook
@@ -5336,8 +6139,10 @@ function context() {
     };
   }
 
+  const character = readCharacter(state, read, DOMAINS);
+
   return {
-    state, read, step, word, tallies, growth, explain, territories,
+    state, read, step, word, tallies, growth, explain, territories, character,
     mapTab: App.mapTab,
     picking: App.picking,
     syncStatus: App.syncStatus,
@@ -5416,6 +6221,13 @@ function render() {
     ${toastHtml()}
   `;
 
+  // The figure breathes while its view is on screen.
+  if (App.avatarStop) { App.avatarStop(); App.avatarStop = null; }
+  const avatarEl = document.getElementById('avatar-canvas');
+  if (avatarEl) {
+    App.avatarStop = animateAvatar(avatarEl, () => context().character, DOMAINS);
+  }
+
   // Canvas passes have to happen after the DOM exists.
   if (App.view === 'map' && App.mapTab === 'land') drawLand(ctx);
   if (App.view === 'map' && App.mapTab === 'earth') drawEarth(ctx);
@@ -5483,8 +6295,8 @@ function drawLand(ctx) {
 
   // ground
   const grd = g.createLinearGradient(0, 0, 0, H);
-  grd.addColorStop(0, '#0a0c13');
-  grd.addColorStop(1, '#0e1119');
+  grd.addColorStop(0, '#F7F4FE');
+  grd.addColorStop(1, '#EDE9FB');
   g.fillStyle = grd;
   g.fillRect(0, 0, W, H);
 
@@ -5509,10 +6321,10 @@ function drawLand(ctx) {
     g.beginPath();
     hexPath(g, cx, cy, R);
     g.fillStyle = t.total === 0
-      ? 'rgba(30,34,48,.5)'
-      : `hsla(${d.hue}, ${18 + kindled * 30}%, ${8 + frac * 22}%, ${.55 + frac * .45})`;
+      ? 'rgba(226,219,246,.55)'
+      : `hsla(${d.hue}, ${28 + kindled * 38}%, ${93 - frac * 16}%, ${.7 + frac * .3})`;
     g.fill();
-    g.strokeStyle = t.total === 0 ? '#232838' : `hsla(${d.hue}, 45%, ${28 + frac * 32}%, .9)`;
+    g.strokeStyle = t.total === 0 ? '#D8D0F0' : `hsla(${d.hue}, 58%, ${72 - frac * 16}%, .95)`;
     g.lineWidth = 2;
     g.stroke();
 
@@ -5520,19 +6332,19 @@ function drawLand(ctx) {
     if (frac > 0) {
       g.beginPath();
       hexPath(g, cx, cy, R * (0.28 + frac * 0.62));
-      g.fillStyle = `hsla(${d.hue}, 62%, 52%, .30)`;
+      g.fillStyle = `hsla(${d.hue}, 68%, 66%, .34)`;
       g.fill();
-      g.strokeStyle = `hsla(${d.hue}, 70%, 62%, .8)`;
+      g.strokeStyle = `hsla(${d.hue}, 62%, 58%, .85)`;
       g.lineWidth = 1.5;
       g.stroke();
     }
 
-    g.fillStyle = t.total === 0 ? '#5a5d70' : '#e8e6e0';
+    g.fillStyle = t.total === 0 ? '#9A93B9' : '#34305A';
     g.font = `600 ${fs}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.fillText(d.name, cx, cy - 2);
 
-    g.fillStyle = t.total === 0 ? '#43465a' : `hsl(${d.hue}, 55%, 68%)`;
+    g.fillStyle = t.total === 0 ? '#ADA6C8' : `hsl(${d.hue}, 46%, 44%)`;
     g.font = `${fs * 0.82}px ui-sans-serif, system-ui, sans-serif`;
     g.fillText(t.total ? `${t.done}/${t.total} taken` : 'unclaimed', cx, cy + fs + 2);
   });
@@ -5540,7 +6352,7 @@ function drawLand(ctx) {
   // The app's own caption. Joshua 1:3 is printed in full, with its reference
   // and context, in the panel above — a canvas label cannot do that, and
   // trimming a verse to fit a width is not something this app does.
-  g.fillStyle = '#6f7284';
+  g.fillStyle = '#9A93B9';
   g.font = `${clamp(W / 62, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
   g.fillText('Ground is taken by treading it. Set a Stone in a territory to begin.', W / 2, H - 8);
@@ -5562,12 +6374,12 @@ function drawEarth(ctx) {
   const cv = document.getElementById('earth-canvas');
   if (!cv) return;
   const { g, W, H } = fitCanvas(cv, 900 / 560);
-  g.fillStyle = '#080a10';
+  g.fillStyle = '#EAF2FB';
   g.fillRect(0, 0, W, H);
 
   const pings = ctx.state.pings;
   if (!pings.length) {
-    g.fillStyle = '#4a4d60';
+    g.fillStyle = '#9A93B9';
     g.font = `${clamp(W / 32, 12, 15)}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.fillText('No ground marked yet.', W / 2, H / 2 - 8);
@@ -5596,7 +6408,7 @@ function drawEarth(ctx) {
 
   // distance rings
   const kmPerDeg = 111.32;
-  g.strokeStyle = '#1a1e2b';
+  g.strokeStyle = '#D3E2F2';
   g.lineWidth = 1;
   for (const km of [0.5, 1, 2, 5, 10, 25]) {
     const r = (km / kmPerDeg) * scale;
@@ -5604,26 +6416,26 @@ function drawEarth(ctx) {
     g.beginPath();
     g.arc(W / 2, H / 2, r, 0, Math.PI * 2);
     g.stroke();
-    g.fillStyle = '#2c3244';
+    g.fillStyle = '#A9BDD2';
     g.font = '10px ui-monospace, monospace';
     g.textAlign = 'left';
     g.fillText(`${km}km`, W / 2 + r + 4, H / 2 - 3);
   }
 
   // crosshair
-  g.strokeStyle = '#161a26';
+  g.strokeStyle = '#DCE8F5';
   g.beginPath(); g.moveTo(0, H / 2); g.lineTo(W, H / 2);
   g.moveTo(W / 2, 0); g.lineTo(W / 2, H); g.stroke();
 
   // compass
-  g.fillStyle = '#3a3e52';
+  g.fillStyle = '#8FA6BE';
   g.font = '600 12px ui-sans-serif, sans-serif';
   g.textAlign = 'center';
   g.fillText('N', W / 2, 16);
 
   // trail between pings, oldest to newest
   const ordered = pings.slice().sort((a, b) => a.ts - b.ts);
-  g.strokeStyle = 'rgba(224,176,84,.22)';
+  g.strokeStyle = 'rgba(224,146,31,.45)';
   g.lineWidth = 1.5;
   g.setLineDash([4, 5]);
   g.beginPath();
@@ -5637,23 +6449,23 @@ function drawEarth(ctx) {
   ordered.forEach((p, i) => {
     const { x, y } = proj(p);
     const isLast = i === ordered.length - 1;
-    const color = p.kind === 'quest' ? '#5b8fb0' : '#e0b054';
+    const color = p.kind === 'quest' ? '#57ABE6' : '#F5AE3C';
 
     if (isLast) {
       g.beginPath();
       g.arc(x, y, 15, 0, Math.PI * 2);
-      g.fillStyle = 'rgba(224,176,84,.14)';
+      g.fillStyle = 'rgba(245,174,60,.24)';
       g.fill();
     }
     g.beginPath();
     g.arc(x, y, 6, 0, Math.PI * 2);
     g.fillStyle = color;
     g.fill();
-    g.strokeStyle = '#080a10';
+    g.strokeStyle = '#FFFFFF';
     g.lineWidth = 2;
     g.stroke();
 
-    g.fillStyle = '#c9cbd6';
+    g.fillStyle = '#4A5B6E';
     g.font = `${clamp(W / 40, 10, 13)}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     const label = p.label || 'Ebenezer';
@@ -5661,7 +6473,7 @@ function drawEarth(ctx) {
   });
 
   // As above: 1 Samuel 7:12 is printed in full above the map.
-  g.fillStyle = '#6f7284';
+  g.fillStyle = '#8FA6BE';
   g.font = `${clamp(W / 60, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
   g.fillText('Each marker is ground you actually stood on.', W / 2, H - 8);
@@ -5674,7 +6486,7 @@ function drawGrowth(ctx) {
   if (!cv) return;
   const { g, W, H } = fitCanvas(cv, 900 / 420);
   g.clearRect(0, 0, W, H);
-  g.fillStyle = '#0a0c13';
+  g.fillStyle = '#FBF9FF';
   g.fillRect(0, 0, W, H);
 
   const pts = ctx.growth.points;
@@ -5684,7 +6496,7 @@ function drawGrowth(ctx) {
   const ih = H - pad.t - pad.b;
 
   if (pts.length < 2) {
-    g.fillStyle = '#4a4d60';
+    g.fillStyle = '#9A93B9';
     g.font = `${clamp(W / 32, 12, 15)}px ui-sans-serif, system-ui, sans-serif`;
     g.textAlign = 'center';
     g.fillText('Two days of steps and the lines appear.', W / 2, H / 2);
@@ -5696,9 +6508,9 @@ function drawGrowth(ctx) {
   const Y = (v) => pad.t + ih - (v / maxY) * ih;
 
   // grid
-  g.strokeStyle = '#171b26';
+  g.strokeStyle = '#E7E1F7';
   g.lineWidth = 1;
-  g.fillStyle = '#4a4d60';
+  g.fillStyle = '#9A93B9';
   g.font = `${fs}px ui-monospace, monospace`;
   g.textAlign = 'right';
   for (let i = 0; i <= 4; i++) {
@@ -5714,32 +6526,32 @@ function drawGrowth(ctx) {
   for (let i = pts.length - 1; i >= 0; i--) g.lineTo(X(i), Y(pts[i].linear));
   g.closePath();
   const fill = g.createLinearGradient(0, pad.t, 0, H);
-  fill.addColorStop(0, 'rgba(224,176,84,.22)');
-  fill.addColorStop(1, 'rgba(224,176,84,.02)');
+  fill.addColorStop(0, 'rgba(245,174,60,.32)');
+  fill.addColorStop(1, 'rgba(245,174,60,.04)');
   g.fillStyle = fill;
   g.fill();
 
   // linear
   g.beginPath();
   pts.forEach((p, i) => { const x = X(i); i === 0 ? g.moveTo(x, Y(p.linear)) : g.lineTo(x, Y(p.linear)); });
-  g.strokeStyle = '#8b8f9e';
-  g.lineWidth = 2;
+  g.strokeStyle = '#A9A2C6';
+  g.lineWidth = 2.5;
   g.stroke();
 
   // increase
   g.beginPath();
   pts.forEach((p, i) => { const x = X(i); i === 0 ? g.moveTo(x, Y(p.increase)) : g.lineTo(x, Y(p.increase)); });
-  g.strokeStyle = '#e0b054';
-  g.lineWidth = 2.5;
+  g.strokeStyle = '#E0921F';
+  g.lineWidth = 3;
   g.stroke();
 
   // endpoint
   const last = pts[pts.length - 1];
   g.beginPath();
   g.arc(X(pts.length - 1), Y(last.increase), 4.5, 0, Math.PI * 2);
-  g.fillStyle = '#e0b054'; g.fill();
+  g.fillStyle = '#E0921F'; g.fill();
 
-  g.fillStyle = '#4a4d60';
+  g.fillStyle = '#9A93B9';
   g.font = `${fs}px ui-monospace, monospace`;
   g.textAlign = 'left';
   g.fillText(pts[0].day, pad.l, H - fs * 0.6);
@@ -5747,7 +6559,7 @@ function drawGrowth(ctx) {
   g.fillText(last.day, W - pad.r, H - fs * 0.6);
 
   if (Math.abs(last.increase - last.linear) < 0.01) {
-    g.fillStyle = '#8b8f9e';
+    g.fillStyle = '#7C74A4';
     g.font = `italic ${clamp(W / 40, 10, 13)}px Georgia, serif`;
     g.textAlign = 'center';
     g.fillText('One line. Consistency is what separates them.', W / 2, pad.t + 14);
@@ -6110,6 +6922,60 @@ const actions = {
     if (App.focusTimer) clearInterval(App.focusTimer);
     App.focus = null; App.focusTimer = null;
     closeModal();
+  },
+
+  // ── logging what actually happened ──
+  'new-deed'(el) { openModal(V.deedModal(context(), el?.dataset?.domain || null)); },
+
+  'pick-size'(el) {
+    document.getElementById('d-size').value = el.dataset.size;
+    for (const c of document.querySelectorAll('.size-chip')) c.classList.remove('on');
+    el.classList.add('on');
+  },
+
+  'deed-save'() {
+    const text = (document.getElementById('d-text')?.value || '').trim();
+    const box = document.getElementById('deed-errors');
+    if (text.length < 3) {
+      box.innerHTML = `<div class="err">Say what you did, even briefly.</div>`;
+      return;
+    }
+    const dom = document.getElementById('d-domain')?.value || DOMAINS[0].key;
+    const sizeKey = document.getElementById('d-size')?.value || 'small';
+    const identityId = document.getElementById('d-identity')?.value || null;
+    const size = deedSize(sizeKey);
+
+    const before = readCharacter(App.state, readState(App.state), DOMAINS);
+    const deed = addDeed(App.state, { text, domain: dom, identityId, size: size.key, xp: size.xp });
+    if (identityId) castVote(App.state, { identityId, questId: null, isFor: true });
+
+    const after = readCharacter(App.state, readState(App.state), DOMAINS);
+    const levelled = after.level > before.level;
+    const staged = after.stage.key !== before.stage.key;
+
+    chronicle(App.state, {
+      kind: 'deed',
+      title: text,
+      body: `Logged in ${domain(dom).name}. +${size.xp} XP.`
+        + (staged ? ` You reached ${after.stage.name}, level ${after.level}.` : levelled ? ` Level ${after.level}.` : ''),
+      refs: [{ ref: 'Hebrews 11:1', why: 'Hebrews describes faith as the evidence of what is not yet seen.' }],
+      meta: { deedId: deed.id, domain: dom, xp: size.xp },
+    });
+    persist();
+    closeModal();
+
+    if (levelled) {
+      // A new STAGE is a different announcement from a new level inside one.
+      openModal(`
+        <div class="manna">
+          <div class="eyebrow" style="color:var(--gold)">${staged ? 'New stage' : `Level ${after.level}`}</div>
+          <div class="m-title">${esc(staged ? after.stage.name : `Level ${after.level}`)}</div>
+          <p class="small mut">${esc(staged ? after.stage.line : levelUpLine(after))}</p>
+          <button class="btn primary" data-act="close-modal">Go on</button>
+        </div>`);
+    } else {
+      toast(`+${size.xp} XP · ${domain(dom).name} is tended`, 'gold');
+    }
   },
 
   // ── map ──

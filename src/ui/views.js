@@ -14,6 +14,7 @@ import { SCRIPTURE, verseByRef } from '../data/scripture.js';
 import { IDENTITY_TIERS, NAME_ARCHETYPES, automaticityAt } from '../core/identity.js';
 import { DIFFICULTY, FOCUS_PRESETS, difficulty } from '../core/engine.js';
 import { SEED_STONES, SEED_IDENTITIES, DECLARATION } from '../data/board.js';
+import { characterMood, DEED_SIZES, STAGES } from '../core/character.js';
 
 // ── shared fragments ──────────────────────────────────────────────────────
 
@@ -68,10 +69,97 @@ function initials(name) {
   return String(name || '?').trim().split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
 }
 
+
+/**
+ * The character panel — the top of the daily screen.
+ *
+ * Deliberately placed above the step: the answer to "where are the visuals"
+ * is that you should meet the figure before you meet any words.
+ */
+export function characterPanel(ch) {
+  const mood = characterMood(ch);
+  const next = ch.nextStage;
+  return `<section class="hero-char tone-${esc(mood.tone)}" data-testid="character">
+    <canvas id="avatar-canvas" aria-label="Your figure at level ${ch.level}"></canvas>
+    <div class="char-body">
+      <div class="char-top">
+        <div>
+          <div class="char-name">${esc(ch.name)}</div>
+          <div class="char-stage">${esc(ch.stage.name)} · Level ${ch.level}</div>
+        </div>
+        <div class="char-hud">
+          ${ch.streak ? `<span class="hud-chip gold" title="days standing">▲ ${ch.streak}</span>` : ''}
+          <span class="hud-chip" title="grace">✦ ${ch.grace}</span>
+        </div>
+      </div>
+
+      <div class="xp" title="${ch.intoLevel} / ${ch.levelSpan} XP">
+        <i style="width:${pct(ch.levelProgress)}%"></i>
+      </div>
+      <div class="char-line">
+        <span>${esc(mood.line)}</span>
+        <b data-testid="xp-to-next">${next ? `${ch.xpToNext} XP to ${esc(next.name)}` : `${ch.xpToNext} XP to level ${ch.level + 1}`}</b>
+      </div>
+
+      <div class="vitals" data-testid="vitals">
+        ${Object.values(ch.vitals).map((v) => `
+          <button class="vital ${esc(v.state)}" data-act="open-territory" data-domain="${esc(v.domain.key)}"
+                  data-testid="vital-${esc(v.domain.key)}"
+                  title="${esc(v.domain.name)} — ${v.days === null ? 'never tended' : v.days === 0 ? 'tended today' : v.days + ' days since'}">
+            <span class="vital-ring" style="--v:${pct(v.value)}%;--h:${v.domain.hue}"></span>
+            <span class="vital-name">${esc(v.domain.name.split(' ')[0])}</span>
+          </button>`).join('')}
+      </div>
+    </div>
+  </section>`;
+}
+
+/** The log-what-you-did composer. */
+export function deedModal(ctx, presetDomain = null) {
+  const { state } = ctx;
+  return `
+  <div class="eyebrow">Evidence</div>
+  <h2>What did you do?</h2>
+  <p class="small mut">It does not have to have been on the list. If it happened, it counts — it feeds the territory and it casts a vote.</p>
+  <div class="field">
+    <label for="d-text">In your own words</label>
+    <input type="text" id="d-text" placeholder="Closed the Anderson deal" data-testid="d-text">
+  </div>
+  <div class="field">
+    <label for="d-domain">Which territory?</label>
+    <select id="d-domain" data-testid="d-domain">
+      ${DOMAINS.map((d) => `<option value="${esc(d.key)}" ${presetDomain === d.key ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}
+    </select>
+  </div>
+  <div class="field">
+    <label>How big was it?</label>
+    <div class="size-row" data-testid="d-sizes">
+      ${DEED_SIZES.map((z, i) => `
+        <button type="button" class="size-chip ${i === 0 ? 'on' : ''}" data-act="pick-size" data-size="${esc(z.key)}" data-testid="size-${esc(z.key)}">
+          <b>${esc(z.label)}</b><span>${esc(z.line)}</span><i>+${z.xp}</i>
+        </button>`).join('')}
+    </div>
+    <input type="hidden" id="d-size" value="small">
+  </div>
+  ${state.identities.length ? `
+  <div class="field">
+    <label for="d-identity">Who does this prove you are?</label>
+    <select id="d-identity" data-testid="d-identity">
+      <option value="">— no identity —</option>
+      ${state.identities.map((i) => `<option value="${esc(i.id)}">${esc(i.statement)}</option>`).join('')}
+    </select>
+  </div>` : ''}
+  <div id="deed-errors"></div>
+  <div class="btn-row mt16">
+    <button class="btn primary" data-act="deed-save" data-testid="deed-save">Log it</button>
+    <button class="btn ghost" data-act="close-modal">Cancel</button>
+  </div>`;
+}
+
 // ── TODAY ─────────────────────────────────────────────────────────────────
 
 export function todayView(ctx) {
-  const { step, word, read, state, growth } = ctx;
+  const { step, word, read, state, growth, character } = ctx;
   const tone = step.tone || 'action';
 
   const actionBtn = step.action
@@ -89,6 +177,8 @@ export function todayView(ctx) {
     : '';
 
   return `
+  ${character ? characterPanel(character) : ''}
+
   <section class="step tone-${esc(tone)}" data-testid="next-step">
     <div class="eyebrow">${step.kind === 'sabbath' ? 'The Sabbath' : 'The next step'}</div>
     <h1>${esc(step.title)}</h1>
@@ -102,6 +192,10 @@ export function todayView(ctx) {
     ${verseBlock(step.verse)}
     ${whyBlock(step.why)}
   </section>
+
+  <div class="btn-row mt16">
+    <button class="btn primary wide" data-act="new-deed" data-testid="btn-log-deed">✎ Log something I did</button>
+  </div>
 
   ${growth ? growthStrip(growth) : ''}
 
@@ -774,8 +868,8 @@ export function runningFocusModal(st) {
   <div class="timer ${st.resting ? 'resting' : ''}">
     <div class="ring">
       <svg width="168" height="168">
-        <circle cx="84" cy="84" r="${R}" fill="none" stroke="#232838" stroke-width="8"></circle>
-        <circle cx="84" cy="84" r="${R}" fill="none" stroke="${st.resting ? '#5b8fb0' : '#e0b054'}" stroke-width="8"
+        <circle cx="84" cy="84" r="${R}" fill="none" stroke="#E7E1F7" stroke-width="8"></circle>
+        <circle cx="84" cy="84" r="${R}" fill="none" stroke="${st.resting ? '#57ABE6' : '#F5AE3C'}" stroke-width="8"
           stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - frac)}"></circle>
       </svg>
       <div class="ring-mid"><div class="clock" data-testid="focus-clock">${mm}:${ss}</div></div>
