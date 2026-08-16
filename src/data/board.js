@@ -16,7 +16,7 @@
 
 export const BOARD_TITLE = 'Faith. Family. Freedom. Financial Abundance. Global Impact. Legacy.';
 
-/** Suggested identities, one per territory. Editable, and validated normally. */
+/** Suggested identities, one per area. Editable, and validated normally. */
 export const SEED_IDENTITIES = [
   {
     domain: 'faith',

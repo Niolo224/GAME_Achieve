@@ -1869,11 +1869,11 @@ function principlesForPillar(pillar) {
 /* ─── data/art.js ─────────────────────────────────────── */
 
 /**
- * art.js — territory artwork.
+ * art.js — area artwork.
  *
  * ── HOW THIS ART GOT HERE ─────────────────────────────────────────────────
  * Six images were generated with Higgsfield (soul_location), one per
- * territory on the board: a cross on a ridge at sunrise, a pier at golden
+ * area on the board: a cross on a ridge at sunrise, a pier at golden
  * sunset, a city skyline at blue hour, an empty iron gym at dawn, the earth
  * at night, and a long table lit for a feast.
  *
@@ -1942,15 +1942,15 @@ function gridToRGBA(grid) {
 const cache = new Map();
 
 /**
- * Render a territory's backdrop and return it as a data URI.
+ * Render an area's backdrop and return it as a data URI.
  *
  * The 8×6 sample is painted to a tiny canvas, then scaled up with smoothing
  * on so it becomes a continuous gradient mesh rather than visible blocks. A
- * wash in the territory's own hue ties it to the rest of the interface, and
+ * wash in the area's own hue ties it to the rest of the interface, and
  * a vignette keeps the card's title legible over any part of it.
  *
- * @param {string} key territory key
- * @param {number} hue territory hue, for the wash
+ * @param {string} key area key
+ * @param {number} hue area hue, for the wash
  */
 function artFor(key, hue = 42) {
   const grid = ART_GRIDS[key];
@@ -1987,7 +1987,7 @@ function artFor(key, hue = 42) {
   g.fillStyle = 'rgb(142, 138, 176)';
   g.fillRect(0, 0, W, H);
 
-  // 4. Hand it the territory's hue outright, keeping the render's luminance.
+  // 4. Hand it the area's hue outright, keeping the render's luminance.
   //    A translucent wash could not survive step 3 — it came out grey — so
   //    the hue is applied as a blend rather than as a tint.
   g.globalCompositeOperation = 'color';
@@ -2047,7 +2047,7 @@ function verifyArt() {
 
 const BOARD_TITLE = 'Faith. Family. Freedom. Financial Abundance. Global Impact. Legacy.';
 
-/** Suggested identities, one per territory. Editable, and validated normally. */
+/** Suggested identities, one per area. Editable, and validated normally. */
 const SEED_IDENTITIES = [
   {
     domain: 'faith',
@@ -2266,12 +2266,16 @@ const DECLARATION = 'I build. I invest. I impact. I create legacy.';
 const SCHEMA_VERSION = 1;
 
 /**
- * The four territories of the Promised Land map — the domains actually on
- * this player's vision board.
+ * The six areas of the map — the parts of life actually on this player's
+ * vision board.
+ *
+ * The KEYS are permanent: they are written into every saved game, so they
+ * survive renaming. Only `name` is shown to anyone, which is why
+ * `brotherhood` still keys the area now called Friends.
  *
  * `blurb` is plain description written by this app. It is deliberately NOT a
  * verse fragment: a clipped half-verse presented as if it were the verse is
- * exactly the kind of bending scripture is not for. Where a territory has a
+ * exactly the kind of bending scripture is not for. Where an area has a
  * verse, it carries a `ref`, and the UI pulls the FULL text from
  * data/scripture.js so nothing is ever quoted in part.
  */
@@ -2318,7 +2322,7 @@ const DOMAINS = [
   },
   {
     key: 'brotherhood',
-    name: 'Brotherhood',
+    name: 'Friends',
     ref: 'Ecclesiastes 4:12',
     blurb: 'The people around the table with you.',
     hue: 24,
@@ -2327,8 +2331,8 @@ const DOMAINS = [
 ];
 
 /**
- * Old domain keys map forward, so a save written before the territories were
- * retuned still opens instead of losing its stones.
+ * Old domain keys map forward, so a save written before the areas were
+ * retuned still opens instead of losing anything set in them.
  */
 const LEGACY_DOMAINS = {
   health: 'body',
@@ -2464,7 +2468,7 @@ function migrate(raw) {
   for (const k of ['identities', 'boards', 'stones', 'quests', 'votes', 'pings', 'focusBlocks', 'manna', 'chronicle', 'letters', 'deeds']) {
     if (!Array.isArray(out[k])) out[k] = [];
   }
-  // Remap territories from the earlier six-domain layout.
+  // Remap areas from the earlier six-domain layout.
   for (const s2 of out.stones) s2.domain = normalizeDomain(s2.domain);
   for (const i of out.identities) i.domain = normalizeDomain(i.domain);
 
@@ -4214,7 +4218,7 @@ function nextStep(state, read = readState(state)) {
     return {
       kind: 'write_vision',
       title: 'Write the vision. Make it plain.',
-      body: 'Upload your vision board and tap each thing on it, or describe them one at a time. Each becomes a Stone — a memorial you will take ground toward.',
+      body: 'Upload your vision board and tap each thing on it, or describe them one at a time. Each one becomes a goal you can actually work toward.',
       action: { view: 'vision', label: 'Write it' },
       verse: verseFor('vision_created', seed),
       why: principle('possible_selves'),
@@ -4503,7 +4507,7 @@ function nextStage(level) {
 }
 
 /**
- * A territory's vital: how tended this part of your life is right now.
+ * An area's vital: how tended this part of your life is right now.
  *
  * Half-life decay from the last time you did something there, lifted by how
  * much you have done there overall. Floors at 0.12 — dim, never dark, never
@@ -4513,7 +4517,7 @@ function vitalFor({ lastDay, total, today = dayKey(), halfLife = 6 }) {
   if (!lastDay || !total) return { value: 0.12, days: null, state: 'untouched' };
   const days = Math.max(0, daysBetween(lastDay, today));
   const freshness = Math.pow(0.5, days / halfLife);
-  // Depth: a territory you have worked twenty times holds its colour longer.
+  // Depth: an area you have worked twenty times holds its colour longer.
   const depth = clamp(Math.log(1 + total) / Math.log(1 + 20), 0, 1);
   const value = clamp(0.12 + (0.88 * freshness) * (0.55 + 0.45 * depth), 0.12, 1);
   return {
@@ -4547,7 +4551,7 @@ function readCharacter(state, read, DOMAINS) {
   const floor = xpForLevel(level);
   const ceil = xpForLevel(level + 1);
 
-  // Vitals, one per territory, from steps AND logged deeds.
+  // Vitals, one per area, from steps AND logged deeds.
   const vitals = {};
   for (const d of DOMAINS) {
     const events = [
@@ -4587,7 +4591,7 @@ function readCharacter(state, read, DOMAINS) {
   };
 }
 
-/** Which territory a completed quest belongs to, via its stone. */
+/** Which area a completed step belongs to. */
 function domainOfQuest(quest, state) {
   const stone = state.stones.find((s) => s.id === quest.stoneId);
   if (stone) return stone.domain;
@@ -4606,7 +4610,7 @@ function characterMood(ch) {
   if (ch.weakest && ch.weakest.state === 'waiting') {
     return { tone: 'waiting', line: `${ch.weakest.domain.name} has been waiting ${ch.weakest.days} days. It is still there.` };
   }
-  if (ch.wholeness > 0.7) return { tone: 'strong', line: 'Every territory is tended.' };
+  if (ch.wholeness > 0.7) return { tone: 'strong', line: 'Every area is tended.' };
   if (ch.xp === 0) return { tone: 'new', line: 'No evidence yet. That is exactly where Gideon was standing.' };
   return { tone: 'steady', line: 'Steady. One step moves the whole figure.' };
 }
@@ -4650,7 +4654,7 @@ function deedSize(key) {
  *
  * The look is soft and daylit — rounded shapes, pastel hills, a friendly
  * character with a big head and big eyes. The scene is not decoration: the
- * six hills ARE the six territories, their colour and height are the vitals,
+ * six hills ARE the six areas, their colour and height are the vitals,
  * the sun rises with the streak, and the character's gear is its stage. If
  * you can read the picture you can read the save file.
  */
@@ -4746,8 +4750,8 @@ function drawAvatar(cv, ch, DOMAINS, t = 0) {
   cloud(((W * 0.62 + drift * 0.6) % (W + 200)) - 100, H * 0.29, W * 0.034, 0.62);
   cloud(((W * 0.92 + drift * 0.35) % (W + 200)) - 100, H * 0.10, W * 0.026, 0.5);
 
-  // ── six hills, one per territory ───────────────────────────────────────
-  // Height and colour are the vital. A neglected territory does not vanish —
+  // ── six hills, one per area ────────────────────────────────────────────
+  // Height and colour are the vital. A neglected area does not vanish —
   // it goes pale and low, and it is still standing there when you come back.
   const bandW = W / DOMAINS.length;
   const order = [0, 3, 1, 4, 2, 5];   // interleave so neighbours differ in hue
@@ -5059,7 +5063,7 @@ function verseBlock(v, { small = false, note = true } = {}) {
   </blockquote>`;
 }
 
-/** A territory's verse, always in full, pulled from the one bank. */
+/** An area's verse, always in full, pulled from the one bank. */
 function domainVerse(key) {
   const d = domain(key);
   return d.ref ? verseByRef(d.ref) : null;
@@ -5145,13 +5149,13 @@ function deedModal(ctx, presetDomain = null) {
   return `
   <div class="eyebrow">Evidence</div>
   <h2>What did you do?</h2>
-  <p class="small mut">It does not have to have been on the list. If it happened, it counts — it feeds the territory and it casts a vote.</p>
+  <p class="small mut">It does not have to have been on the list. If it happened, it counts — it feeds the area and it casts a vote.</p>
   <div class="field">
     <label for="d-text">In your own words</label>
     <input type="text" id="d-text" placeholder="Closed the Anderson deal" data-testid="d-text">
   </div>
   <div class="field">
-    <label for="d-domain">Which territory?</label>
+    <label for="d-domain">Which area?</label>
     <select id="d-domain" data-testid="d-domain">
       ${DOMAINS.map((d) => `<option value="${esc(d.key)}" ${presetDomain === d.key ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}
     </select>
@@ -5309,7 +5313,7 @@ function visionView(ctx) {
     ${state.stones.length === 0 ? `
       <div class="card tight mt16" style="border-color:var(--gold-dim);background:linear-gradient(160deg,rgba(224,176,84,.09),transparent 60%),var(--ink-2)">
         <div class="eyebrow" style="color:var(--gold)">Your board, already written</div>
-        <p class="small mut mb0">${SEED_STONES.length} things are named on it, across six territories. Load them in one tap — each arrives veiled, so the gate still applies.</p>
+        <p class="small mut mb0">${SEED_STONES.length} things are named on it, across six areas. Load them in one tap — each arrives unplanned, so the gate still applies.</p>
         <div class="btn-row mt16">
           <button class="btn primary" data-act="seed-board" data-testid="btn-seed">▣ Load my vision board</button>
         </div>
@@ -5324,8 +5328,8 @@ function visionView(ctx) {
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>Stones</h3><span class="spacer"></span><span class="pill">${state.stones.length}</span></div>
-    <p class="small mut">Joshua took twelve stones out of the Jordan and set them as a memorial. Each thing on your board is one of these — and each stays veiled until you have counted its cost.</p>
+    <div class="card-head"><h3>Goals</h3><span class="spacer"></span><span class="pill">${state.stones.length}</span></div>
+    <p class="small mut">Everything on your board is a goal here. Each one stays unplanned until you have thought through what would stop you — that is the gate, and it is the whole reason this works.</p>
     ${state.stones.length === 0 ? `<div class="empty">Nothing written yet.</div>` : `
       <div class="grid two mt16">
         ${state.stones.map((s) => stoneCard(s, ctx)).join('')}
@@ -5344,9 +5348,9 @@ function stoneCard(s, ctx) {
     ${s.woopComplete
       ? `<div class="mt8"><div class="bar"><i style="width:${pct(prog.progress)}%"></i></div>
          <div class="tiny mut mt8">${prog.done}/${prog.total} steps${prog.nearing && prog.remaining > 0 ? ' · closing' : ''}</div></div>`
-      : `<div class="veil-badge">◈ Veiled — count the cost</div>`}
+      : `<div class="veil-badge">◈ Not planned yet</div>`}
     <div class="btn-row mt8">
-      <button class="btn sm" data-act="open-stone" data-stone="${esc(s.id)}" data-testid="btn-open-stone">${s.woopComplete ? 'Open' : 'Count the cost'}</button>
+      <button class="btn sm" data-act="open-stone" data-stone="${esc(s.id)}" data-testid="btn-open-stone">${s.woopComplete ? 'Open' : 'Plan it'}</button>
     </div>
   </div>`;
 }
@@ -5436,7 +5440,7 @@ function identityView(ctx) {
       : state.identities.map((i) => identityCard(i, tallies[i.id], ctx)).join('')}
     ${state.identities.length < SEED_IDENTITIES.length ? `
       <hr class="sep">
-      <div class="eyebrow">Starting points, one per territory</div>
+      <div class="eyebrow">Starting points, one per area</div>
       <div class="seed-row">
         ${SEED_IDENTITIES.map((sd, i) => state.identities.some((x) => x.domain === sd.domain) ? '' : `
           <button class="seed-chip" data-act="seed-identity" data-i="${i}" data-testid="seed-id-${esc(sd.domain)}">
@@ -5533,17 +5537,17 @@ function whyGateModal(identity, why, questText, gate = {}) {
 // ── MAPS ──────────────────────────────────────────────────────────────────
 
 function mapView(ctx) {
-  const { mapTab, state, territories } = ctx;
+  const { mapTab, state, areas } = ctx;
   return `
   <div class="map-tabs">
-    <button data-act="map-tab" data-tab="land" aria-pressed="${mapTab === 'land'}" data-testid="tab-land">◈ Promised Land</button>
-    <button data-act="map-tab" data-tab="earth" aria-pressed="${mapTab === 'earth'}" data-testid="tab-earth">⌖ Real ground</button>
+    <button data-act="map-tab" data-tab="land" aria-pressed="${mapTab === 'land'}" data-testid="tab-land">◈ Your areas</button>
+    <button data-act="map-tab" data-tab="earth" aria-pressed="${mapTab === 'earth'}" data-testid="tab-earth">⌖ Places</button>
   </div>
 
   ${mapTab === 'land' ? `
     <div class="terr-grid" data-testid="terr-grid">
       ${DOMAINS.map((d) => {
-        const t = territories[d.key] || { total: 0, done: 0, kindled: 0 };
+        const t = areas[d.key] || { total: 0, done: 0, kindled: 0 };
         const frac = t.total ? t.done / t.total : 0;
         const art = artFor(d.art || d.key, d.hue);
         return `<button class="terr ${t.total ? '' : 'unclaimed'}" data-act="open-territory" data-domain="${esc(d.key)}" data-testid="terr-${esc(d.key)}">
@@ -5551,7 +5555,7 @@ function mapView(ctx) {
           <span class="terr-scrim" style="background:linear-gradient(180deg,transparent 20%,hsla(${d.hue},45%,6%,.92) 100%)"></span>
           <span class="terr-body">
             <span class="terr-name">${esc(d.name)}</span>
-            <span class="terr-count">${t.total ? `${t.done}/${t.total}` : 'no stones yet'}</span>
+            <span class="terr-count">${t.total ? `${t.done}/${t.total}` : 'nothing set yet'}</span>
             <span class="terr-bar"><i style="width:${pct(frac)}%;background:hsl(${d.hue} 65% 58%)"></i></span>
           </span>
         </button>`;
@@ -5559,7 +5563,7 @@ function mapView(ctx) {
     </div>
   ` : `
     <div class="card">
-      <div class="card-head"><h2>Real ground</h2><span class="spacer"></span>
+      <div class="card-head"><h2>Places</h2><span class="spacer"></span>
         <button class="btn sm primary" data-act="ping-me" data-testid="btn-ping-me">⌖ Ping me here</button>
       </div>
       ${verseBlock(SCRIPTURE.find((v) => v.ref === '1 Samuel 7:12'))}
@@ -5577,7 +5581,7 @@ function mapView(ctx) {
           <div class="grow"><div class="t">${esc(p.label || 'Ebenezer')}</div>
           <div class="s">${p.lat.toFixed(4)}, ${p.lng.toFixed(4)} · ${esc(p.day)}${p.note ? ' · ' + esc(p.note) : ''}</div></div>
           <button class="btn sm ghost" data-act="delete-ping" data-ping="${esc(p.id)}">×</button>
-        </div>`).join('')}` : `<div class="empty mt16"><div class="big">⌖</div>No ground marked yet. "Ping me here" drops an Ebenezer stone where you stand.</div>`}
+        </div>`).join('')}` : `<div class="empty mt16"><div class="big">⌖</div>No places marked yet. "Ping me here" drops a marker where you stand.</div>`}
     </div>
   `}`;
 }
@@ -5731,7 +5735,7 @@ function chronicleView(ctx) {
       <div class="stat"><div class="n">${recap.longestStreak}</div><div class="l">Longest run</div></div>
     </div>
     <div class="grid three mt16">
-      <div class="stat"><div class="n">${recap.stonesTaken}/${recap.stonesTotal}</div><div class="l">Ground taken</div></div>
+      <div class="stat"><div class="n">${recap.stonesTaken}/${recap.stonesTotal}</div><div class="l">Goals done</div></div>
       <div class="stat"><div class="n">${recap.focusMinutes}</div><div class="l">Focus minutes</div></div>
       <div class="stat"><div class="n">${recap.identityGrowth.length}</div><div class="l">Identities</div></div>
     </div>
@@ -5830,7 +5834,7 @@ function questModal(ctx, preset = {}) {
   ${stones.length === 0 ? `<div class="err">No kindled Stones yet. Count the cost on one first — a step with nothing behind it is just a chore.</div>` : ''}
 
   <div class="field">
-    <label for="q-stone">Toward which Stone?</label>
+    <label for="q-stone">Toward which goal?</label>
     <select id="q-stone" data-testid="q-stone">
       <option value="">— none —</option>
       ${stones.map((s) => `<option value="${esc(s.id)}" ${preset.stoneId === s.id ? 'selected' : ''}>${esc(s.title)}</option>`).join('')}
@@ -6066,13 +6070,13 @@ function boot() {
   App.vault = loadVault() || emptyVault();
   App.adapter = createAdapter(App.state);
 
-  // Manna spoils if it is hoarded. Exodus 16:20.
+  // Rewards expire if they are hoarded. Exodus 16:20.
   const decayed = decayManna(App.state.manna, dayKey());
   if (decayed.spoiledCount > 0) {
     App.state.manna = decayed.kept;
     chronicle(App.state, {
       kind: 'manna_spoiled',
-      title: `${decayed.spoiledCount} manna spoiled`,
+      title: `${decayed.spoiledCount} rewards expired`,
       body: 'Gathered but never spent. What was kept overnight bred worms — the daily portion is meant to be used.',
       refs: [{ ref: 'Exodus 16:20', why: 'Israel was told to gather only a day\'s portion; what was kept overnight spoiled.' }],
     });
@@ -6128,10 +6132,10 @@ function context() {
   const growth = runGrowth(series);
   const explain = explainRate(displayTerms(series));
 
-  const territories = {};
+  const areas = {};
   for (const d of DOMAINS) {
     const stones = state.stones.filter((s) => s.domain === d.key);
-    territories[d.key] = {
+    areas[d.key] = {
       total: stones.length,
       done: stones.filter((s) => s.completedAt).length,
       kindled: stones.filter((s) => s.woopComplete).length,
@@ -6142,7 +6146,7 @@ function context() {
   const character = readCharacter(state, read, DOMAINS);
 
   return {
-    state, read, step, word, tallies, growth, explain, territories, character,
+    state, read, step, word, tallies, growth, explain, areas, character,
     mapTab: App.mapTab,
     picking: App.picking,
     syncStatus: App.syncStatus,
@@ -6300,7 +6304,7 @@ function drawLand(ctx) {
   g.fillStyle = grd;
   g.fillRect(0, 0, W, H);
 
-  // Grid adapts to however many territories are configured.
+  // Grid adapts to however many areas are configured.
   const cols = DOMAINS.length <= 4 ? 2 : 3;
   const rows = Math.ceil(DOMAINS.length / cols);
   const pad = Math.max(10, W * 0.029);
@@ -6312,7 +6316,7 @@ function drawLand(ctx) {
   DOMAINS.forEach((d, i) => {
     const cx = pad + (i % cols) * cw + cw / 2;
     const cy = pad + Math.floor(i / cols) * ch + ch / 2;
-    const t = ctx.territories[d.key];
+    const t = ctx.areas[d.key];
     const frac = t.total ? t.done / t.total : 0;
     const kindled = t.total ? t.kindled / t.total : 0;
 
@@ -6355,7 +6359,7 @@ function drawLand(ctx) {
   g.fillStyle = '#9A93B9';
   g.font = `${clamp(W / 62, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
-  g.fillText('Ground is taken by treading it. Set a Stone in a territory to begin.', W / 2, H - 8);
+  g.fillText('An area fills as you finish goals in it. Add a goal to begin.', W / 2, H - 8);
 }
 
 function hexPath(g, cx, cy, r) {
@@ -6622,7 +6626,7 @@ const actions = {
         <div class="hint">Not "I want to be". Not "I will be". The name comes before the evidence — that is the order God uses, and the order the research supports.</div>
       </div>
       <div class="field">
-        <label for="id-domain">Which territory?</label>
+        <label for="id-domain">Which area?</label>
         <select id="id-domain" data-testid="id-domain">
           ${DOMAINS.map((d) => `<option value="${d.key}">${d.name} — ${d.blurb}</option>`).join('')}
         </select>
@@ -6730,7 +6734,7 @@ const actions = {
         chronicle(App.state, {
           kind: 'board',
           title: 'The vision was made plain',
-          body: 'Your board is now in the game. Tap each thing on it to set a Stone.',
+          body: 'Your board is now in the game. Tap each thing on it to make it a goal.',
           refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
         });
         persist();
@@ -6803,7 +6807,7 @@ const actions = {
     chronicle(App.state, {
       kind: 'woop',
       title: `Counted the cost: ${stone.title}`,
-      body: `The obstacle was named — "${woop.obstacle.slice(0, 90)}" — and answered with an if-then. This Stone is kindled.`,
+      body: `The obstacle was named — "${woop.obstacle.slice(0, 90)}" — and answered with an if-then. This goal is planned.`,
       refs: [{ ref: 'Luke 14:28', why: 'Christ\'s warning about beginning to build without first reckoning what it costs.' }],
     });
     persist();
@@ -6813,7 +6817,7 @@ const actions = {
   },
 
   'delete-stone'(el) {
-    if (!confirm('Delete this Stone and its steps?')) return;
+    if (!confirm('Delete this goal and its steps?')) return;
     const id = el.dataset.stone;
     App.state.stones = App.state.stones.filter((s) => s.id !== id);
     App.state.quests = App.state.quests.filter((q) => q.stoneId !== id);
@@ -6995,10 +6999,10 @@ const actions = {
           <div class="small mut">${esc(d.blurb)}</div></div>
       </div>` : `<h2>${esc(d.name)}</h2>`}
       ${verse ? V.verseBlock(verse) : ''}
-      <div class="card-head mt16"><h3>Stones here</h3><span class="spacer"></span>
+      <div class="card-head mt16"><h3>Goals here</h3><span class="spacer"></span>
         <span class="pill">${stones.length}</span></div>
       ${stones.length === 0
-        ? `<div class="empty">Nothing set in this territory yet.</div>`
+        ? `<div class="empty">Nothing set in this area yet.</div>`
         : stones.map((st) => {
             const p = stoneProgress(st, App.state.quests);
             return `<div class="row">
@@ -7006,11 +7010,11 @@ const actions = {
                 <div class="t">${esc(st.title)}</div>
                 <div class="s">${st.woopComplete ? `${p.done}/${p.total} steps` : 'veiled — count the cost'}</div>
               </div>
-              <button class="btn sm" data-act="open-stone" data-stone="${esc(st.id)}">${st.woopComplete ? 'Open' : 'Kindle'}</button>
+              <button class="btn sm" data-act="open-stone" data-stone="${esc(st.id)}">${st.woopComplete ? 'Open' : 'Plan it'}</button>
             </div>`;
           }).join('')}
       <div class="btn-row mt16">
-        <button class="btn primary" data-act="new-stone-in" data-domain="${esc(key)}">+ Set a stone here</button>
+        <button class="btn primary" data-act="new-stone-in" data-domain="${esc(key)}">+ Add a goal here</button>
         <button class="btn ghost" data-act="close-modal">Close</button>
       </div>`);
   },
@@ -7040,14 +7044,14 @@ const actions = {
     }
     chronicle(state, {
       kind: 'board',
-      title: `The vision was written — ${added} stones`,
+      title: `The vision was written — ${added} goals`,
       body: `${BOARD_TITLE} Every one arrives veiled. Count the cost on one and it kindles.`,
       refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
     });
     persist();
     App.view = 'vision';
     render();
-    toast(`${added} stones set. Kindle the one that matters most.`, 'gold');
+    toast(`${added} goals set. Plan the one that matters most.`, 'gold');
   },
 
   'seed-identity'(el) {
@@ -7080,7 +7084,7 @@ const actions = {
         chronicle(App.state, {
           kind: 'ping',
           title: `Ground marked: ${label}`,
-          body: 'A stone set where you actually stood. Context becomes part of the memory trace — the same act in the same place builds automaticity faster.',
+          body: 'A place you actually stood, marked. Context becomes part of the memory trace — the same act in the same place builds automaticity faster.',
           refs: [{ ref: '1 Samuel 7:12', why: 'Samuel set a stone at Mizpeh to mark where God had helped Israel.' }],
         });
         persist(); render();
@@ -7257,7 +7261,7 @@ const actions = {
   },
 
   'wipe-all'() {
-    if (!confirm('Erase everything — stones, steps, history, the vault?')) return;
+    if (!confirm('Erase everything — goals, steps, history, the vault?')) return;
     if (!confirm('Really? There is no undo.')) return;
     App.state = emptyState();
     App.vault = emptyVault();
@@ -7276,7 +7280,7 @@ const actions = {
 function openStoneComposer(meta) {
   const ids = App.state.identities;
   openModal(`
-    <div class="eyebrow">A stone of remembrance</div>
+    <div class="eyebrow">Something from your board</div>
     <h2>What is on your board?</h2>
     ${V.verseBlock(verseByRef('Joshua 4:6'))}
     <div class="field">
@@ -7284,7 +7288,7 @@ function openStoneComposer(meta) {
       <input type="text" id="s-title" placeholder="The house with the red door" data-testid="s-title">
     </div>
     <div class="field">
-      <label for="s-domain">Territory</label>
+      <label for="s-domain">Area</label>
       <select id="s-domain" data-testid="s-domain">
         ${DOMAINS.map((d) => `<option value="${d.key}" ${meta.domain === d.key ? 'selected' : ''}>${d.name}</option>`).join('')}
       </select>
@@ -7331,7 +7335,7 @@ function completeQuest(quest, opts = {}) {
       chronicle(state, {
         kind: 'stone_taken',
         title: `Ground taken: ${stone.title}`,
-        body: 'Every step bound to this Stone is complete. Faithful over a few things.',
+        body: 'Every step toward this goal is complete. Faithful over a few things.',
         refs: [{ ref: 'Matthew 25:21', why: 'In the parable of the talents, the servant faithful with little is entrusted with more.' }],
       });
     }
@@ -7357,10 +7361,10 @@ function completeQuest(quest, opts = {}) {
   if (award.manna) {
     openModal(`
       <div class="manna">
-        <div class="m-title">Manna fell.</div>
+        <div class="m-title">A reward.</div>
         <p class="small mut">Unearned surplus, on top of what you expected. It cannot be hoarded — unspent, it spoils in two days.</p>
         ${V.verseBlock(verseByRef('Exodus 16:4'))}
-        <button class="btn primary" data-act="close-modal">Gather it</button>
+        <button class="btn primary" data-act="close-modal">Take it</button>
       </div>`);
   } else {
     render();

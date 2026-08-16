@@ -7,7 +7,7 @@
  *
  * The look is soft and daylit — rounded shapes, pastel hills, a friendly
  * character with a big head and big eyes. The scene is not decoration: the
- * six hills ARE the six territories, their colour and height are the vitals,
+ * six hills ARE the six areas, their colour and height are the vitals,
  * the sun rises with the streak, and the character's gear is its stage. If
  * you can read the picture you can read the save file.
  */
@@ -105,8 +105,8 @@ export function drawAvatar(cv, ch, DOMAINS, t = 0) {
   cloud(((W * 0.62 + drift * 0.6) % (W + 200)) - 100, H * 0.29, W * 0.034, 0.62);
   cloud(((W * 0.92 + drift * 0.35) % (W + 200)) - 100, H * 0.10, W * 0.026, 0.5);
 
-  // ── six hills, one per territory ───────────────────────────────────────
-  // Height and colour are the vital. A neglected territory does not vanish —
+  // ── six hills, one per area ────────────────────────────────────────────
+  // Height and colour are the vital. A neglected area does not vanish —
   // it goes pale and low, and it is still standing there when you come back.
   const bandW = W / DOMAINS.length;
   const order = [0, 3, 1, 4, 2, 5];   // interleave so neighbours differ in hue

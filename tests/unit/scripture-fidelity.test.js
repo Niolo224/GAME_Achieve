@@ -92,7 +92,7 @@ const KJV = {
   'Psalm 119:105': 'Thy word is a lamp unto my feet, and a light unto my path.',
   'Psalm 4:4':
     'Stand in awe, and sin not: commune with your own heart upon your bed, and be still. Selah.',
-  // The four territories.
+  // The six areas.
   'Proverbs 22:29':
     'Seest thou a man diligent in his business? he shall stand before kings; he shall not stand before mean men.',
   '1 Corinthians 6:19':
@@ -197,10 +197,18 @@ describe('ONE SOURCE OF TRUTH for verse text', () => {
   });
 });
 
-describe('the territories', () => {
-  test('are exactly the pillars on this vision board', () => {
+describe('the areas', () => {
+  test('are exactly the six on this vision board, in the player\'s own words', () => {
     assert.deepEqual(DOMAINS.map((d) => d.name),
-      ['Faith', 'Family & Legacy', 'Enterprise', 'Body', 'Global', 'Brotherhood']);
+      ['Faith', 'Family & Legacy', 'Enterprise', 'Body', 'Global', 'Friends']);
+  });
+
+  test('keep their storage keys when they are renamed, so old saves still open', () => {
+    // 'Brotherhood' was renamed to 'Friends'; the key must not follow the
+    // label, or every saved game loses whatever was set in it.
+    const friends = DOMAINS.find((d) => d.name === 'Friends');
+    assert.equal(friends.key, 'brotherhood');
+    assert.equal(normalizeDomain('brotherhood'), 'brotherhood');
   });
 
   test('each carries a verse that resolves, in full, in the bank', () => {
@@ -211,7 +219,7 @@ describe('the territories', () => {
     }
   });
 
-  test('saves from every earlier territory layout still open', () => {
+  test('saves from every earlier layout still open', () => {
     // The original six.
     assert.equal(normalizeDomain('provision'), 'enterprise');
     assert.equal(normalizeDomain('household'), 'family');

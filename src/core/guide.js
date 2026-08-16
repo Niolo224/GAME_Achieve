@@ -96,7 +96,7 @@ export function nextStep(state, read = readState(state)) {
     return {
       kind: 'write_vision',
       title: 'Write the vision. Make it plain.',
-      body: 'Upload your vision board and tap each thing on it, or describe them one at a time. Each becomes a Stone — a memorial you will take ground toward.',
+      body: 'Upload your vision board and tap each thing on it, or describe them one at a time. Each one becomes a goal you can actually work toward.',
       action: { view: 'vision', label: 'Write it' },
       verse: verseFor('vision_created', seed),
       why: principle('possible_selves'),

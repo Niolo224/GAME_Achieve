@@ -34,7 +34,7 @@ export function verseBlock(v, { small = false, note = true } = {}) {
   </blockquote>`;
 }
 
-/** A territory's verse, always in full, pulled from the one bank. */
+/** An area's verse, always in full, pulled from the one bank. */
 export function domainVerse(key) {
   const d = domain(key);
   return d.ref ? verseByRef(d.ref) : null;
@@ -120,13 +120,13 @@ export function deedModal(ctx, presetDomain = null) {
   return `
   <div class="eyebrow">Evidence</div>
   <h2>What did you do?</h2>
-  <p class="small mut">It does not have to have been on the list. If it happened, it counts — it feeds the territory and it casts a vote.</p>
+  <p class="small mut">It does not have to have been on the list. If it happened, it counts — it feeds the area and it casts a vote.</p>
   <div class="field">
     <label for="d-text">In your own words</label>
     <input type="text" id="d-text" placeholder="Closed the Anderson deal" data-testid="d-text">
   </div>
   <div class="field">
-    <label for="d-domain">Which territory?</label>
+    <label for="d-domain">Which area?</label>
     <select id="d-domain" data-testid="d-domain">
       ${DOMAINS.map((d) => `<option value="${esc(d.key)}" ${presetDomain === d.key ? 'selected' : ''}>${esc(d.name)}</option>`).join('')}
     </select>
@@ -284,7 +284,7 @@ export function visionView(ctx) {
     ${state.stones.length === 0 ? `
       <div class="card tight mt16" style="border-color:var(--gold-dim);background:linear-gradient(160deg,rgba(224,176,84,.09),transparent 60%),var(--ink-2)">
         <div class="eyebrow" style="color:var(--gold)">Your board, already written</div>
-        <p class="small mut mb0">${SEED_STONES.length} things are named on it, across six territories. Load them in one tap — each arrives veiled, so the gate still applies.</p>
+        <p class="small mut mb0">${SEED_STONES.length} things are named on it, across six areas. Load them in one tap — each arrives unplanned, so the gate still applies.</p>
         <div class="btn-row mt16">
           <button class="btn primary" data-act="seed-board" data-testid="btn-seed">▣ Load my vision board</button>
         </div>
@@ -299,8 +299,8 @@ export function visionView(ctx) {
   </div>
 
   <div class="card">
-    <div class="card-head"><h3>Stones</h3><span class="spacer"></span><span class="pill">${state.stones.length}</span></div>
-    <p class="small mut">Joshua took twelve stones out of the Jordan and set them as a memorial. Each thing on your board is one of these — and each stays veiled until you have counted its cost.</p>
+    <div class="card-head"><h3>Goals</h3><span class="spacer"></span><span class="pill">${state.stones.length}</span></div>
+    <p class="small mut">Everything on your board is a goal here. Each one stays unplanned until you have thought through what would stop you — that is the gate, and it is the whole reason this works.</p>
     ${state.stones.length === 0 ? `<div class="empty">Nothing written yet.</div>` : `
       <div class="grid two mt16">
         ${state.stones.map((s) => stoneCard(s, ctx)).join('')}
@@ -319,9 +319,9 @@ function stoneCard(s, ctx) {
     ${s.woopComplete
       ? `<div class="mt8"><div class="bar"><i style="width:${pct(prog.progress)}%"></i></div>
          <div class="tiny mut mt8">${prog.done}/${prog.total} steps${prog.nearing && prog.remaining > 0 ? ' · closing' : ''}</div></div>`
-      : `<div class="veil-badge">◈ Veiled — count the cost</div>`}
+      : `<div class="veil-badge">◈ Not planned yet</div>`}
     <div class="btn-row mt8">
-      <button class="btn sm" data-act="open-stone" data-stone="${esc(s.id)}" data-testid="btn-open-stone">${s.woopComplete ? 'Open' : 'Count the cost'}</button>
+      <button class="btn sm" data-act="open-stone" data-stone="${esc(s.id)}" data-testid="btn-open-stone">${s.woopComplete ? 'Open' : 'Plan it'}</button>
     </div>
   </div>`;
 }
@@ -411,7 +411,7 @@ export function identityView(ctx) {
       : state.identities.map((i) => identityCard(i, tallies[i.id], ctx)).join('')}
     ${state.identities.length < SEED_IDENTITIES.length ? `
       <hr class="sep">
-      <div class="eyebrow">Starting points, one per territory</div>
+      <div class="eyebrow">Starting points, one per area</div>
       <div class="seed-row">
         ${SEED_IDENTITIES.map((sd, i) => state.identities.some((x) => x.domain === sd.domain) ? '' : `
           <button class="seed-chip" data-act="seed-identity" data-i="${i}" data-testid="seed-id-${esc(sd.domain)}">
@@ -508,17 +508,17 @@ export function whyGateModal(identity, why, questText, gate = {}) {
 // ── MAPS ──────────────────────────────────────────────────────────────────
 
 export function mapView(ctx) {
-  const { mapTab, state, territories } = ctx;
+  const { mapTab, state, areas } = ctx;
   return `
   <div class="map-tabs">
-    <button data-act="map-tab" data-tab="land" aria-pressed="${mapTab === 'land'}" data-testid="tab-land">◈ Promised Land</button>
-    <button data-act="map-tab" data-tab="earth" aria-pressed="${mapTab === 'earth'}" data-testid="tab-earth">⌖ Real ground</button>
+    <button data-act="map-tab" data-tab="land" aria-pressed="${mapTab === 'land'}" data-testid="tab-land">◈ Your areas</button>
+    <button data-act="map-tab" data-tab="earth" aria-pressed="${mapTab === 'earth'}" data-testid="tab-earth">⌖ Places</button>
   </div>
 
   ${mapTab === 'land' ? `
     <div class="terr-grid" data-testid="terr-grid">
       ${DOMAINS.map((d) => {
-        const t = territories[d.key] || { total: 0, done: 0, kindled: 0 };
+        const t = areas[d.key] || { total: 0, done: 0, kindled: 0 };
         const frac = t.total ? t.done / t.total : 0;
         const art = artFor(d.art || d.key, d.hue);
         return `<button class="terr ${t.total ? '' : 'unclaimed'}" data-act="open-territory" data-domain="${esc(d.key)}" data-testid="terr-${esc(d.key)}">
@@ -526,7 +526,7 @@ export function mapView(ctx) {
           <span class="terr-scrim" style="background:linear-gradient(180deg,transparent 20%,hsla(${d.hue},45%,6%,.92) 100%)"></span>
           <span class="terr-body">
             <span class="terr-name">${esc(d.name)}</span>
-            <span class="terr-count">${t.total ? `${t.done}/${t.total}` : 'no stones yet'}</span>
+            <span class="terr-count">${t.total ? `${t.done}/${t.total}` : 'nothing set yet'}</span>
             <span class="terr-bar"><i style="width:${pct(frac)}%;background:hsl(${d.hue} 65% 58%)"></i></span>
           </span>
         </button>`;
@@ -534,7 +534,7 @@ export function mapView(ctx) {
     </div>
   ` : `
     <div class="card">
-      <div class="card-head"><h2>Real ground</h2><span class="spacer"></span>
+      <div class="card-head"><h2>Places</h2><span class="spacer"></span>
         <button class="btn sm primary" data-act="ping-me" data-testid="btn-ping-me">⌖ Ping me here</button>
       </div>
       ${verseBlock(SCRIPTURE.find((v) => v.ref === '1 Samuel 7:12'))}
@@ -552,7 +552,7 @@ export function mapView(ctx) {
           <div class="grow"><div class="t">${esc(p.label || 'Ebenezer')}</div>
           <div class="s">${p.lat.toFixed(4)}, ${p.lng.toFixed(4)} · ${esc(p.day)}${p.note ? ' · ' + esc(p.note) : ''}</div></div>
           <button class="btn sm ghost" data-act="delete-ping" data-ping="${esc(p.id)}">×</button>
-        </div>`).join('')}` : `<div class="empty mt16"><div class="big">⌖</div>No ground marked yet. "Ping me here" drops an Ebenezer stone where you stand.</div>`}
+        </div>`).join('')}` : `<div class="empty mt16"><div class="big">⌖</div>No places marked yet. "Ping me here" drops a marker where you stand.</div>`}
     </div>
   `}`;
 }
@@ -706,7 +706,7 @@ export function chronicleView(ctx) {
       <div class="stat"><div class="n">${recap.longestStreak}</div><div class="l">Longest run</div></div>
     </div>
     <div class="grid three mt16">
-      <div class="stat"><div class="n">${recap.stonesTaken}/${recap.stonesTotal}</div><div class="l">Ground taken</div></div>
+      <div class="stat"><div class="n">${recap.stonesTaken}/${recap.stonesTotal}</div><div class="l">Goals done</div></div>
       <div class="stat"><div class="n">${recap.focusMinutes}</div><div class="l">Focus minutes</div></div>
       <div class="stat"><div class="n">${recap.identityGrowth.length}</div><div class="l">Identities</div></div>
     </div>
@@ -805,7 +805,7 @@ export function questModal(ctx, preset = {}) {
   ${stones.length === 0 ? `<div class="err">No kindled Stones yet. Count the cost on one first — a step with nothing behind it is just a chore.</div>` : ''}
 
   <div class="field">
-    <label for="q-stone">Toward which Stone?</label>
+    <label for="q-stone">Toward which goal?</label>
     <select id="q-stone" data-testid="q-stone">
       <option value="">— none —</option>
       ${stones.map((s) => `<option value="${esc(s.id)}" ${preset.stoneId === s.id ? 'selected' : ''}>${esc(s.title)}</option>`).join('')}

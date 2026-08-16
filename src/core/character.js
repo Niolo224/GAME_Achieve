@@ -60,7 +60,7 @@ export function nextStage(level) {
 }
 
 /**
- * A territory's vital: how tended this part of your life is right now.
+ * An area's vital: how tended this part of your life is right now.
  *
  * Half-life decay from the last time you did something there, lifted by how
  * much you have done there overall. Floors at 0.12 — dim, never dark, never
@@ -70,7 +70,7 @@ export function vitalFor({ lastDay, total, today = dayKey(), halfLife = 6 }) {
   if (!lastDay || !total) return { value: 0.12, days: null, state: 'untouched' };
   const days = Math.max(0, daysBetween(lastDay, today));
   const freshness = Math.pow(0.5, days / halfLife);
-  // Depth: a territory you have worked twenty times holds its colour longer.
+  // Depth: an area you have worked twenty times holds its colour longer.
   const depth = clamp(Math.log(1 + total) / Math.log(1 + 20), 0, 1);
   const value = clamp(0.12 + (0.88 * freshness) * (0.55 + 0.45 * depth), 0.12, 1);
   return {
@@ -104,7 +104,7 @@ export function readCharacter(state, read, DOMAINS) {
   const floor = xpForLevel(level);
   const ceil = xpForLevel(level + 1);
 
-  // Vitals, one per territory, from steps AND logged deeds.
+  // Vitals, one per area, from steps AND logged deeds.
   const vitals = {};
   for (const d of DOMAINS) {
     const events = [
@@ -144,7 +144,7 @@ export function readCharacter(state, read, DOMAINS) {
   };
 }
 
-/** Which territory a completed quest belongs to, via its stone. */
+/** Which area a completed step belongs to. */
 function domainOfQuest(quest, state) {
   const stone = state.stones.find((s) => s.id === quest.stoneId);
   if (stone) return stone.domain;
@@ -163,7 +163,7 @@ export function characterMood(ch) {
   if (ch.weakest && ch.weakest.state === 'waiting') {
     return { tone: 'waiting', line: `${ch.weakest.domain.name} has been waiting ${ch.weakest.days} days. It is still there.` };
   }
-  if (ch.wholeness > 0.7) return { tone: 'strong', line: 'Every territory is tended.' };
+  if (ch.wholeness > 0.7) return { tone: 'strong', line: 'Every area is tended.' };
   if (ch.xp === 0) return { tone: 'new', line: 'No evidence yet. That is exactly where Gideon was standing.' };
   return { tone: 'steady', line: 'Steady. One step moves the whole figure.' };
 }

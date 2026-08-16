@@ -1,9 +1,9 @@
 /**
- * art.js — territory artwork.
+ * art.js — area artwork.
  *
  * ── HOW THIS ART GOT HERE ─────────────────────────────────────────────────
  * Six images were generated with Higgsfield (soul_location), one per
- * territory on the board: a cross on a ridge at sunrise, a pier at golden
+ * area on the board: a cross on a ridge at sunrise, a pier at golden
  * sunset, a city skyline at blue hour, an empty iron gym at dawn, the earth
  * at night, and a long table lit for a feast.
  *
@@ -72,15 +72,15 @@ export function gridToRGBA(grid) {
 const cache = new Map();
 
 /**
- * Render a territory's backdrop and return it as a data URI.
+ * Render an area's backdrop and return it as a data URI.
  *
  * The 8×6 sample is painted to a tiny canvas, then scaled up with smoothing
  * on so it becomes a continuous gradient mesh rather than visible blocks. A
- * wash in the territory's own hue ties it to the rest of the interface, and
+ * wash in the area's own hue ties it to the rest of the interface, and
  * a vignette keeps the card's title legible over any part of it.
  *
- * @param {string} key territory key
- * @param {number} hue territory hue, for the wash
+ * @param {string} key area key
+ * @param {number} hue area hue, for the wash
  */
 export function artFor(key, hue = 42) {
   const grid = ART_GRIDS[key];
@@ -117,7 +117,7 @@ export function artFor(key, hue = 42) {
   g.fillStyle = 'rgb(142, 138, 176)';
   g.fillRect(0, 0, W, H);
 
-  // 4. Hand it the territory's hue outright, keeping the render's luminance.
+  // 4. Hand it the area's hue outright, keeping the render's luminance.
   //    A translucent wash could not survive step 3 — it came out grey — so
   //    the hue is applied as a blend rather than as a tint.
   g.globalCompositeOperation = 'color';

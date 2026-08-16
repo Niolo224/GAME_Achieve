@@ -18,12 +18,16 @@ import { uid, dayKey } from './util.js';
 export const SCHEMA_VERSION = 1;
 
 /**
- * The four territories of the Promised Land map — the domains actually on
- * this player's vision board.
+ * The six areas of the map — the parts of life actually on this player's
+ * vision board.
+ *
+ * The KEYS are permanent: they are written into every saved game, so they
+ * survive renaming. Only `name` is shown to anyone, which is why
+ * `brotherhood` still keys the area now called Friends.
  *
  * `blurb` is plain description written by this app. It is deliberately NOT a
  * verse fragment: a clipped half-verse presented as if it were the verse is
- * exactly the kind of bending scripture is not for. Where a territory has a
+ * exactly the kind of bending scripture is not for. Where an area has a
  * verse, it carries a `ref`, and the UI pulls the FULL text from
  * data/scripture.js so nothing is ever quoted in part.
  */
@@ -70,7 +74,7 @@ export const DOMAINS = [
   },
   {
     key: 'brotherhood',
-    name: 'Brotherhood',
+    name: 'Friends',
     ref: 'Ecclesiastes 4:12',
     blurb: 'The people around the table with you.',
     hue: 24,
@@ -79,8 +83,8 @@ export const DOMAINS = [
 ];
 
 /**
- * Old domain keys map forward, so a save written before the territories were
- * retuned still opens instead of losing its stones.
+ * Old domain keys map forward, so a save written before the areas were
+ * retuned still opens instead of losing anything set in them.
  */
 const LEGACY_DOMAINS = {
   health: 'body',
@@ -216,7 +220,7 @@ export function migrate(raw) {
   for (const k of ['identities', 'boards', 'stones', 'quests', 'votes', 'pings', 'focusBlocks', 'manna', 'chronicle', 'letters', 'deeds']) {
     if (!Array.isArray(out[k])) out[k] = [];
   }
-  // Remap territories from the earlier six-domain layout.
+  // Remap areas from the earlier six-domain layout.
   for (const s2 of out.stones) s2.domain = normalizeDomain(s2.domain);
   for (const i of out.identities) i.domain = normalizeDomain(i.domain);
 

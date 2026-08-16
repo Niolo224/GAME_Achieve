@@ -62,13 +62,13 @@ function boot() {
   App.vault = loadVault() || emptyVault();
   App.adapter = createAdapter(App.state);
 
-  // Manna spoils if it is hoarded. Exodus 16:20.
+  // Rewards expire if they are hoarded. Exodus 16:20.
   const decayed = decayManna(App.state.manna, dayKey());
   if (decayed.spoiledCount > 0) {
     App.state.manna = decayed.kept;
     chronicle(App.state, {
       kind: 'manna_spoiled',
-      title: `${decayed.spoiledCount} manna spoiled`,
+      title: `${decayed.spoiledCount} rewards expired`,
       body: 'Gathered but never spent. What was kept overnight bred worms — the daily portion is meant to be used.',
       refs: [{ ref: 'Exodus 16:20', why: 'Israel was told to gather only a day\'s portion; what was kept overnight spoiled.' }],
     });
@@ -124,10 +124,10 @@ function context() {
   const growth = runGrowth(series);
   const explain = explainRate(displayTerms(series));
 
-  const territories = {};
+  const areas = {};
   for (const d of DOMAINS) {
     const stones = state.stones.filter((s) => s.domain === d.key);
-    territories[d.key] = {
+    areas[d.key] = {
       total: stones.length,
       done: stones.filter((s) => s.completedAt).length,
       kindled: stones.filter((s) => s.woopComplete).length,
@@ -138,7 +138,7 @@ function context() {
   const character = readCharacter(state, read, DOMAINS);
 
   return {
-    state, read, step, word, tallies, growth, explain, territories, character,
+    state, read, step, word, tallies, growth, explain, areas, character,
     mapTab: App.mapTab,
     picking: App.picking,
     syncStatus: App.syncStatus,
@@ -296,7 +296,7 @@ function drawLand(ctx) {
   g.fillStyle = grd;
   g.fillRect(0, 0, W, H);
 
-  // Grid adapts to however many territories are configured.
+  // Grid adapts to however many areas are configured.
   const cols = DOMAINS.length <= 4 ? 2 : 3;
   const rows = Math.ceil(DOMAINS.length / cols);
   const pad = Math.max(10, W * 0.029);
@@ -308,7 +308,7 @@ function drawLand(ctx) {
   DOMAINS.forEach((d, i) => {
     const cx = pad + (i % cols) * cw + cw / 2;
     const cy = pad + Math.floor(i / cols) * ch + ch / 2;
-    const t = ctx.territories[d.key];
+    const t = ctx.areas[d.key];
     const frac = t.total ? t.done / t.total : 0;
     const kindled = t.total ? t.kindled / t.total : 0;
 
@@ -351,7 +351,7 @@ function drawLand(ctx) {
   g.fillStyle = '#9A93B9';
   g.font = `${clamp(W / 62, 9, 12)}px ui-sans-serif, system-ui, sans-serif`;
   g.textAlign = 'center';
-  g.fillText('Ground is taken by treading it. Set a Stone in a territory to begin.', W / 2, H - 8);
+  g.fillText('An area fills as you finish goals in it. Add a goal to begin.', W / 2, H - 8);
 }
 
 function hexPath(g, cx, cy, r) {
@@ -618,7 +618,7 @@ const actions = {
         <div class="hint">Not "I want to be". Not "I will be". The name comes before the evidence — that is the order God uses, and the order the research supports.</div>
       </div>
       <div class="field">
-        <label for="id-domain">Which territory?</label>
+        <label for="id-domain">Which area?</label>
         <select id="id-domain" data-testid="id-domain">
           ${DOMAINS.map((d) => `<option value="${d.key}">${d.name} — ${d.blurb}</option>`).join('')}
         </select>
@@ -726,7 +726,7 @@ const actions = {
         chronicle(App.state, {
           kind: 'board',
           title: 'The vision was made plain',
-          body: 'Your board is now in the game. Tap each thing on it to set a Stone.',
+          body: 'Your board is now in the game. Tap each thing on it to make it a goal.',
           refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
         });
         persist();
@@ -799,7 +799,7 @@ const actions = {
     chronicle(App.state, {
       kind: 'woop',
       title: `Counted the cost: ${stone.title}`,
-      body: `The obstacle was named — "${woop.obstacle.slice(0, 90)}" — and answered with an if-then. This Stone is kindled.`,
+      body: `The obstacle was named — "${woop.obstacle.slice(0, 90)}" — and answered with an if-then. This goal is planned.`,
       refs: [{ ref: 'Luke 14:28', why: 'Christ\'s warning about beginning to build without first reckoning what it costs.' }],
     });
     persist();
@@ -809,7 +809,7 @@ const actions = {
   },
 
   'delete-stone'(el) {
-    if (!confirm('Delete this Stone and its steps?')) return;
+    if (!confirm('Delete this goal and its steps?')) return;
     const id = el.dataset.stone;
     App.state.stones = App.state.stones.filter((s) => s.id !== id);
     App.state.quests = App.state.quests.filter((q) => q.stoneId !== id);
@@ -991,10 +991,10 @@ const actions = {
           <div class="small mut">${esc(d.blurb)}</div></div>
       </div>` : `<h2>${esc(d.name)}</h2>`}
       ${verse ? V.verseBlock(verse) : ''}
-      <div class="card-head mt16"><h3>Stones here</h3><span class="spacer"></span>
+      <div class="card-head mt16"><h3>Goals here</h3><span class="spacer"></span>
         <span class="pill">${stones.length}</span></div>
       ${stones.length === 0
-        ? `<div class="empty">Nothing set in this territory yet.</div>`
+        ? `<div class="empty">Nothing set in this area yet.</div>`
         : stones.map((st) => {
             const p = stoneProgress(st, App.state.quests);
             return `<div class="row">
@@ -1002,11 +1002,11 @@ const actions = {
                 <div class="t">${esc(st.title)}</div>
                 <div class="s">${st.woopComplete ? `${p.done}/${p.total} steps` : 'veiled — count the cost'}</div>
               </div>
-              <button class="btn sm" data-act="open-stone" data-stone="${esc(st.id)}">${st.woopComplete ? 'Open' : 'Kindle'}</button>
+              <button class="btn sm" data-act="open-stone" data-stone="${esc(st.id)}">${st.woopComplete ? 'Open' : 'Plan it'}</button>
             </div>`;
           }).join('')}
       <div class="btn-row mt16">
-        <button class="btn primary" data-act="new-stone-in" data-domain="${esc(key)}">+ Set a stone here</button>
+        <button class="btn primary" data-act="new-stone-in" data-domain="${esc(key)}">+ Add a goal here</button>
         <button class="btn ghost" data-act="close-modal">Close</button>
       </div>`);
   },
@@ -1036,14 +1036,14 @@ const actions = {
     }
     chronicle(state, {
       kind: 'board',
-      title: `The vision was written — ${added} stones`,
+      title: `The vision was written — ${added} goals`,
       body: `${BOARD_TITLE} Every one arrives veiled. Count the cost on one and it kindles.`,
       refs: [{ ref: 'Habakkuk 2:2', why: 'Habakkuk is told to record the revelation plainly enough to be carried at speed.' }],
     });
     persist();
     App.view = 'vision';
     render();
-    toast(`${added} stones set. Kindle the one that matters most.`, 'gold');
+    toast(`${added} goals set. Plan the one that matters most.`, 'gold');
   },
 
   'seed-identity'(el) {
@@ -1076,7 +1076,7 @@ const actions = {
         chronicle(App.state, {
           kind: 'ping',
           title: `Ground marked: ${label}`,
-          body: 'A stone set where you actually stood. Context becomes part of the memory trace — the same act in the same place builds automaticity faster.',
+          body: 'A place you actually stood, marked. Context becomes part of the memory trace — the same act in the same place builds automaticity faster.',
           refs: [{ ref: '1 Samuel 7:12', why: 'Samuel set a stone at Mizpeh to mark where God had helped Israel.' }],
         });
         persist(); render();
@@ -1253,7 +1253,7 @@ const actions = {
   },
 
   'wipe-all'() {
-    if (!confirm('Erase everything — stones, steps, history, the vault?')) return;
+    if (!confirm('Erase everything — goals, steps, history, the vault?')) return;
     if (!confirm('Really? There is no undo.')) return;
     App.state = emptyState();
     App.vault = emptyVault();
@@ -1272,7 +1272,7 @@ const actions = {
 function openStoneComposer(meta) {
   const ids = App.state.identities;
   openModal(`
-    <div class="eyebrow">A stone of remembrance</div>
+    <div class="eyebrow">Something from your board</div>
     <h2>What is on your board?</h2>
     ${V.verseBlock(verseByRef('Joshua 4:6'))}
     <div class="field">
@@ -1280,7 +1280,7 @@ function openStoneComposer(meta) {
       <input type="text" id="s-title" placeholder="The house with the red door" data-testid="s-title">
     </div>
     <div class="field">
-      <label for="s-domain">Territory</label>
+      <label for="s-domain">Area</label>
       <select id="s-domain" data-testid="s-domain">
         ${DOMAINS.map((d) => `<option value="${d.key}" ${meta.domain === d.key ? 'selected' : ''}>${d.name}</option>`).join('')}
       </select>
@@ -1327,7 +1327,7 @@ function completeQuest(quest, opts = {}) {
       chronicle(state, {
         kind: 'stone_taken',
         title: `Ground taken: ${stone.title}`,
-        body: 'Every step bound to this Stone is complete. Faithful over a few things.',
+        body: 'Every step toward this goal is complete. Faithful over a few things.',
         refs: [{ ref: 'Matthew 25:21', why: 'In the parable of the talents, the servant faithful with little is entrusted with more.' }],
       });
     }
@@ -1353,10 +1353,10 @@ function completeQuest(quest, opts = {}) {
   if (award.manna) {
     openModal(`
       <div class="manna">
-        <div class="m-title">Manna fell.</div>
+        <div class="m-title">A reward.</div>
         <p class="small mut">Unearned surplus, on top of what you expected. It cannot be hoarded — unspent, it spoils in two days.</p>
         ${V.verseBlock(verseByRef('Exodus 16:4'))}
-        <button class="btn primary" data-act="close-modal">Gather it</button>
+        <button class="btn primary" data-act="close-modal">Take it</button>
       </div>`);
   } else {
     render();

@@ -54,7 +54,7 @@ describe('the Be > Do > Have chain is enforced in order', () => {
     await page.close();
   });
 
-  test('a stone stays VEILED until the cost is counted', async () => {
+  test('a goal stays UNPLANNED until the obstacle has been faced', async () => {
     const page = await newPage();
     await onboard(page);
     await nameIdentity(page);
@@ -70,7 +70,7 @@ describe('the Be > Do > Have chain is enforced in order', () => {
     assert.equal(state.stones.length, 1);
     assert.equal(state.stones[0].woopComplete, false, 'must not be playable yet');
     const html = await page.textContent('#root');
-    assert.match(html, /Veiled/i);
+    assert.match(html, /Not planned yet/i, 'the card must say plainly that it is not playable');
     await page.close();
   });
 });
