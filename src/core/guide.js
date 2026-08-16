@@ -78,19 +78,6 @@ export function readState(state, today = dayKey()) {
 export function nextStep(state, read = readState(state)) {
   const seed = hashStr(read.today + state.player.id);
 
-  // 0. The Sabbath outranks everything, including progress. That is the point.
-  if (read.sabbath.locked) {
-    return {
-      kind: 'sabbath',
-      title: 'Today the game is closed.',
-      body: read.sabbath.message,
-      action: null,
-      verse: verseFor('sabbath', seed),
-      why: principle('sabbath_recovery'),
-      tone: 'rest',
-    };
-  }
-
   // 1. BE — nothing can be built before a name exists.
   if (!read.hasIdentity) {
     return {
@@ -131,7 +118,26 @@ export function nextStep(state, read = readState(state)) {
     };
   }
 
-  // 4. RETURNING after a gap — fresh start framing, never a scolding.
+  // 4. THE SABBATH LOCK — withholds the work, not the preparation.
+  //
+  // It sits below the setup branches deliberately. Naming who you are,
+  // writing the vision and counting a cost are reflection, not labour, and
+  // a person opening this for the first time on a Sunday should not be met
+  // with a closed door before they have done anything at all. What the
+  // Sabbath withholds is the quest.
+  if (read.sabbath.locked) {
+    return {
+      kind: 'sabbath',
+      title: 'Today the game is closed.',
+      body: read.sabbath.message,
+      action: null,
+      verse: verseFor('sabbath', seed),
+      why: principle('sabbath_recovery'),
+      tone: 'rest',
+    };
+  }
+
+  // 5. RETURNING after a gap — fresh start framing, never a scolding.
   if (read.returning && read.doneToday === 0) {
     const framing = restorationFraming(read.lastActive, read.today);
     return {
@@ -146,7 +152,7 @@ export function nextStep(state, read = readState(state)) {
     };
   }
 
-  // 5. DO — there is a stone ready but no next action bound to it.
+  // 6. DO — there is a stone ready but no next action bound to it.
   if (read.readyStones.length && !read.openQuests.length) {
     const stone = read.readyStones[0];
     return {
@@ -160,7 +166,7 @@ export function nextStep(state, read = readState(state)) {
     };
   }
 
-  // 6. The daily rep.
+  // 7. The daily rep.
   if (read.openQuests.length) {
     const quest = pickQuest(read.openQuests, state, read);
     const stone = state.stones.find((s) => s.id === quest.stoneId);
@@ -179,7 +185,7 @@ export function nextStep(state, read = readState(state)) {
     };
   }
 
-  // 7. Everything open is done — consolidate rather than manufacture more work.
+  // 8. Everything open is done — consolidate rather than manufacture more work.
   return {
     kind: 'consolidate',
     title: read.doneToday > 0 ? 'Today is accounted for.' : 'Nothing is open.',

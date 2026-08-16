@@ -230,7 +230,7 @@ describe('the Upper Room focus timer', () => {
 describe('the Sabbath lock actually withholds the game', () => {
   test('on the configured day, no quest is offered', async () => {
     const page = await newPage();
-    await onboard(page);
+    await onboard(page, 'Sam', { sabbath: true });
     await nameIdentity(page);
     await sealWhy(page);
     await makeStone(page);

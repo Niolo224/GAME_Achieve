@@ -56,11 +56,25 @@ export async function newPage({ geo = null } = {}) {
   return page;
 }
 
-/** Complete onboarding and land in the game. */
-export async function onboard(page, name = 'Sam') {
+/**
+ * Complete onboarding and land in the game.
+ *
+ * The Sabbath lock is switched OFF by default here. It defaults to Sunday in
+ * the app, so leaving it on would make the whole suite pass or fail depending
+ * on which day of the week it happens to run — the tests that complete a step
+ * would simply find no step to complete. The dedicated Sabbath tests turn it
+ * back on explicitly.
+ */
+export async function onboard(page, name = 'Sam', { sabbath = false } = {}) {
   await page.fill('[data-testid=ob-name]', name);
   await page.click('[data-testid=ob-go]');
   await page.waitForSelector('.nav');
+  if (!sabbath) {
+    await page.evaluate(() => {
+      const A = globalThis.__ACHIEVE;
+      A.state.settings.sabbathEnabled = false;
+    });
+  }
 }
 
 /** Name an identity (the Be step), dismissing the Why modal that follows. */

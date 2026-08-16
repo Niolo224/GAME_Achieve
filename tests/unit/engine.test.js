@@ -341,3 +341,61 @@ describe('an unfinished TODAY is not a missed day', () => {
     assert.equal(s.tokensSpent, 1, 'a completed missed day must still be accounted');
   });
 });
+
+describe('the Sabbath withholds the work, not the preparation', () => {
+  test('a first-time player is never met with a closed door', async () => {
+    const { emptyState } = await import('../../src/core/state.js');
+    const { nextStep, readState } = await import('../../src/core/guide.js');
+    const state = emptyState();
+    state.meta.onboarded = true;
+    state.settings.sabbathEnabled = true;
+    state.settings.sabbathDay = new Date().getDay();   // lock today
+
+    const step = nextStep(state, readState(state));
+    assert.notEqual(step.kind, 'sabbath',
+      'someone opening this for the first time must still be asked who they are becoming');
+    assert.equal(step.kind, 'name_identity');
+  });
+
+  test('with an identity but no vision, the Sabbath still lets you write it', async () => {
+    const { emptyState, addIdentity } = await import('../../src/core/state.js');
+    const { nextStep, readState } = await import('../../src/core/guide.js');
+    const state = emptyState();
+    state.meta.onboarded = true;
+    state.settings.sabbathEnabled = true;
+    state.settings.sabbathDay = new Date().getDay();
+    addIdentity(state, { statement: 'I am a man who trains before sunrise', domain: 'body' });
+
+    assert.equal(nextStep(state, readState(state)).kind, 'write_vision');
+  });
+
+  test('counting a cost is reflection, and stays open on the Sabbath', async () => {
+    const { emptyState, addIdentity, addStone } = await import('../../src/core/state.js');
+    const { nextStep, readState } = await import('../../src/core/guide.js');
+    const state = emptyState();
+    state.meta.onboarded = true;
+    state.settings.sabbathEnabled = true;
+    state.settings.sabbathDay = new Date().getDay();
+    const i = addIdentity(state, { statement: 'I am a man who trains before sunrise', domain: 'body' });
+    addStone(state, { title: 'Run the half marathon', domain: 'body', identityId: i.id });
+
+    assert.equal(nextStep(state, readState(state)).kind, 'woop');
+  });
+
+  test('but once everything is set up, the Sabbath does close the game', async () => {
+    const { emptyState, addIdentity, addStone, addQuest } = await import('../../src/core/state.js');
+    const { nextStep, readState } = await import('../../src/core/guide.js');
+    const state = emptyState();
+    state.meta.onboarded = true;
+    state.settings.sabbathEnabled = true;
+    state.settings.sabbathDay = new Date().getDay();
+    const i = addIdentity(state, { statement: 'I am a man who trains before sunrise', domain: 'body' });
+    const st = addStone(state, { title: 'Run the half marathon', domain: 'body', identityId: i.id });
+    st.woopComplete = true;
+    addQuest(state, { stoneId: st.id, identityId: i.id, text: 'When I wake, I will run at the park' });
+
+    const step = nextStep(state, readState(state));
+    assert.equal(step.kind, 'sabbath', 'the quest itself must be withheld');
+    assert.equal(step.action, null);
+  });
+});
